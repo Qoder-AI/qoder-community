@@ -1,0 +1,1537 @@
+---
+/**
+ * Skill Detail Page (Chinese) - Uses translated content
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { getLangFromPath, useTranslations, formatDate, getCategoryLabel, getSourceLabel, getRoleLabel, getSkillDisplayName, getSkillTitle, getSkillDescription } from '../../../i18n';
+import fs from 'node:fs';
+import path from 'node:path';
+
+export async function getStaticPaths() {
+  const skills = await getCollection('skills', ({ id }) => !id.startsWith('_'));
+  return skills.map(skill => ({
+    params: { slug: skill.slug },
+    props: { skill },
+  }));
+}
+
+interface Props {
+  skill: CollectionEntry<'skills'>;
+}
+
+const { skill } = Astro.props;
+
+// Get current language
+const lang = getLangFromPath(Astro.url.pathname);
+const t = useTranslations(lang);
+const langPrefix = lang === 'zh-CN' ? '/zh' : '';
+
+// Get translated skill content
+const displayName = getSkillDisplayName(skill.slug, skill.data.name, lang);
+const displayTitle = getSkillTitle(skill.slug, skill.data.title, lang);
+const displayDescription = getSkillDescription(skill.slug, skill.data.description, lang);
+
+// Try to load Chinese content if available
+let Content: any;
+let hasZhContent = false;
+
+try {
+  // Check if Chinese content file exists
+  const zhContentPath = `src/content/skills-zh/${skill.slug}.md`;
+  const zhContent = await import(`../../../content/skills-zh/${skill.slug}.md`);
+  Content = zhContent.default;
+  hasZhContent = true;
+} catch (e) {
+  // Fall back to English content
+  const englishContent = await skill.render();
+  Content = englishContent.Content;
+}
+
+// Get related skills (same category, excluding current)
+const allSkills = await getCollection('skills', ({ id }) => !id.startsWith('_'));
+const relatedSkills = allSkills
+  .filter(s => s.data.category === skill.data.category && s.slug !== skill.slug)
+  .slice(0, 3);
+
+// Get translated labels
+const categoryLabel = getCategoryLabel(skill.data.category, lang);
+const sourceLabel = getSourceLabel(skill.data.source, lang);
+
+// Source class config
+const sourceClassConfig: Record<string, string> = {
+  anthropic: 'source-anthropic',
+  vercel: 'source-vercel',
+  community: 'source-community',
+  enterprise: 'source-enterprise',
+};
+const sourceClass = sourceClassConfig[skill.data.source] || 'source-community';
+---
+
+<StarlightPage 
+  frontmatter={{ 
+    title: `${displayName} - ${displayTitle}`,
+    description: displayDescription,
+    template: 'splash',
+    tableOfContents: false,
+  }}
+>
+  <div class="skill-detail-page">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb animate-fade-in">
+      <a href={`${langPrefix}/skills/`}>{t('nav.skills')}</a>
+      <span class="separator">/</span>
+      <a href={`${langPrefix}/skills/?category=${skill.data.category}`}>{categoryLabel}</a>
+      <span class="separator">/</span>
+      <span class="current">{displayName}</span>
+    </nav>
+
+    <!-- Skill Header -->
+    <header class="skill-header animate-fade-in-up">
+      <div class="header-content">
+        <h1 class="skill-name">{displayName}</h1>
+        <p class="skill-title">{displayTitle}</p>
+        <div class="skill-badges">
+          {skill.data.isOfficial && <span class="badge badge-official">{t('badge.official')}</span>}
+          {skill.data.popular && <span class="badge badge-popular">{t('badge.popular')}</span>}
+          {skill.data.featured && <span class="badge badge-featured">{t('badge.featured')}</span>}
+          <span class={`badge ${sourceClass}`}>{sourceLabel}</span>
+          <span class="badge badge-category">{categoryLabel}</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href={skill.data.githubUrl} target="_blank" rel="noopener" class="btn secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          {t('common.github')}
+        </a>
+        <button class="btn primary" data-copy-install data-copied-text={t('skill.copied')}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          {t('skill.copyInstallCommand')}
+        </button>
+        <button class="btn secondary" id="share-btn" data-slug={skill.slug} data-title={displayTitle} data-category={skill.data.category}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          分享
+        </button>
+      </div>
+    </header>
+
+    <!-- Two-column layout -->
+    <div class="skill-layout">
+      <!-- Main Content -->
+      <main class="skill-main animate-fade-in-up">
+        <section class="content-section">
+          <h2>{t('skill.description')}</h2>
+          <p class="lead-description">{displayDescription}</p>
+          <div class="markdown-content">
+            {hasZhContent ? <Content /> : <Content />}
+          </div>
+        </section>
+
+        {skill.data.roles && skill.data.roles.length > 0 && (
+          <section class="content-section">
+            <h2>{t('skill.applicableRoles')}</h2>
+            <div class="roles-list">
+              {skill.data.roles.map(roleId => (
+                <span class="role-tag">
+                  {getRoleLabel(roleId, lang)}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {skill.data.tags && skill.data.tags.length > 0 && (
+          <section class="content-section">
+            <h2>{t('skill.tags')}</h2>
+            <div class="tags-list">
+              {skill.data.tags.map(tag => (
+                <span class="skill-tag">{tag}</span>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+
+      <!-- Sidebar -->
+      <aside class="skill-sidebar animate-fade-in-up">
+        <!-- Install Card -->
+        <div class="sidebar-card">
+          <h3>{t('skill.install')}</h3>
+          <div class="install-code" data-install-command>
+            <code>{skill.data.installCommand || `git clone ${skill.data.githubUrl}\ncp -r ${skill.data.name} ~/.qoder/skills/`}</code>
+            <button class="copy-btn" data-copy-btn title="Copy">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="sidebar-card">
+          <h3>{t('skill.information')}</h3>
+          <dl class="info-list">
+            <div class="info-item">
+              <dt>{t('info.source')}</dt>
+              <dd>{sourceLabel}</dd>
+            </div>
+            {skill.data.author && (
+              <div class="info-item">
+                <dt>{t('info.author')}</dt>
+                <dd>{skill.data.author}</dd>
+              </div>
+            )}
+            <div class="info-item">
+              <dt>{t('info.category')}</dt>
+              <dd>{categoryLabel}</dd>
+            </div>
+            <div class="info-item">
+              <dt>{t('info.dateAdded')}</dt>
+              <dd>{formatDate(skill.data.date, lang)}</dd>
+            </div>
+            {skill.data.lastUpdated && (
+              <div class="info-item">
+                <dt>{t('info.lastUpdated')}</dt>
+                <dd>{formatDate(skill.data.lastUpdated, lang)}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+
+        <!-- Links Card -->
+        <div class="sidebar-card">
+          <h3>{t('skill.links')}</h3>
+          <ul class="links-list">
+            <li>
+              <a href={skill.data.githubUrl} target="_blank" rel="noopener">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                {t('skill.githubRepository')}
+              </a>
+            </li>
+            {skill.data.docsUrl && (
+              <li>
+                <a href={skill.data.docsUrl} target="_blank" rel="noopener">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                  {t('skill.documentation')}
+                </a>
+              </li>
+            )}
+            {skill.data.marketplaceUrl && (
+              <li>
+                <a href={skill.data.marketplaceUrl} target="_blank" rel="noopener">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                  {t('skill.marketplace')}
+                </a>
+              </li>
+            )}
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Related Skills -->
+    {relatedSkills.length > 0 && (
+      <section class="related-section animate-fade-in-up">
+        <h2>{t('skill.relatedSkills')}</h2>
+        <div class="related-grid">
+          {relatedSkills.map(related => (
+            <a href={`${langPrefix}/skills/${related.slug}/`} class="related-card hover-lift">
+              <div class="related-content">
+                <span class="related-name">{getSkillDisplayName(related.slug, related.data.name, lang)}</span>
+                <span class="related-title">{getSkillTitle(related.slug, related.data.title, lang)}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Back Link -->
+    <div class="back-link">
+      <a href={`${langPrefix}/skills/`} class="btn ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        {t('skill.backToSkills')}
+      </a>
+    </div>
+  </div>
+
+  <!-- Share Modal -->
+  <div class="share-modal-overlay" id="share-modal" aria-hidden="true">
+    <div class="share-modal" role="dialog" aria-labelledby="share-modal-title">
+      <button class="share-modal-close" id="share-modal-close" aria-label="关闭">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      
+      <div class="share-modal-header">
+        <h2 id="share-modal-title">分享图片已生成</h2>
+        <p class="share-modal-subtitle">保存图片并分享到小红书</p>
+      </div>
+
+      <div class="share-modal-body">
+        <!-- Image Preview -->
+        <div class="share-preview-container">
+          <div class="share-preview-loading" id="share-preview-loading">
+            <div class="share-preview-spinner"></div>
+            <span>生成中</span>
+          </div>
+          <img class="share-preview-image" id="share-preview-image" alt="分享图片预览" />
+        </div>
+
+        <!-- Copy Text Section -->
+        <div class="share-copy-section">
+          <div class="share-copy-label">传播文案</div>
+          <div class="share-copy-content">
+            <p class="share-copy-text" id="share-copy-text"></p>
+            <button class="share-copy-btn" id="share-copy-btn" title="复制文案">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              <span>复制</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Guide Section -->
+        <div class="share-guide-section">
+          <div class="share-guide-title">分享到小红书</div>
+          <ol class="share-guide-steps">
+            <li>点击下方按钮保存图片</li>
+            <li>打开小红书，发布笔记</li>
+            <li>粘贴文案，记得 @qoder</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="share-modal-footer">
+        <button class="share-download-btn" id="share-download-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>保存图片</span>
+        </button>
+        <button class="share-close-btn" id="share-close-secondary">关闭</button>
+      </div>
+    </div>
+  </div>
+</StarlightPage>
+
+<script>
+  // Category to Outcome mapping (duplicated here for inline script)
+  // 注意：所有值都需要能自然配合"让 AI 帮我搞定了 XXX"使用
+  const outcomeMap: Record<string, string> = {
+    document: '文档工作',
+    design: '设计任务',
+    development: '开发任务',
+    marketing: '营销工作',
+    automation: '自动化流程',
+    productivity: '效率难题',
+    security: '安全检测',
+    data: '数据分析',
+    meta: '工具配置',
+  };
+
+  function initCopyButtons() {
+    // Copy button in install code block
+    const copyBtns = document.querySelectorAll('[data-copy-btn]');
+    copyBtns.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const codeBlock = btn.closest('[data-install-command]');
+        const code = codeBlock?.querySelector('code')?.textContent;
+        if (code) {
+          await navigator.clipboard.writeText(code);
+          btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+          setTimeout(() => {
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+          }, 2000);
+        }
+      });
+    });
+
+    // Header copy install button
+    const headerCopyBtn = document.querySelector('[data-copy-install]') as HTMLElement;
+    headerCopyBtn?.addEventListener('click', async () => {
+      const codeBlock = document.querySelector('[data-install-command] code');
+      const code = codeBlock?.textContent;
+      if (code) {
+        await navigator.clipboard.writeText(code);
+        const originalText = headerCopyBtn.innerHTML;
+        const copiedText = headerCopyBtn.dataset.copiedText || 'Copied!';
+        headerCopyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${copiedText}`;
+        setTimeout(() => {
+          headerCopyBtn.innerHTML = originalText;
+        }, 2000);
+      }
+    });
+  }
+
+  // Share Modal functionality
+  let currentImageDataUrl: string = '';
+  let currentSlug: string = '';
+
+  function initShareModal() {
+    const modal = document.getElementById('share-modal');
+    const closeBtn = document.getElementById('share-modal-close');
+    const closeSecondaryBtn = document.getElementById('share-close-secondary');
+    const downloadBtn = document.getElementById('share-download-btn');
+    const copyBtn = document.getElementById('share-copy-btn');
+
+    if (!modal) return;
+
+    // Close modal handlers
+    const closeModal = () => {
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    };
+
+    closeBtn?.addEventListener('click', closeModal);
+    closeSecondaryBtn?.addEventListener('click', closeModal);
+    
+    // Close on overlay click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // Close on ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        closeModal();
+      }
+    });
+
+    // Download button
+    downloadBtn?.addEventListener('click', () => {
+      if (currentImageDataUrl) {
+        downloadImage(currentImageDataUrl, `qoder-skill-${currentSlug}.png`);
+        const span = downloadBtn.querySelector('span');
+        if (span) {
+          const originalText = span.textContent;
+          span.textContent = '已保存';
+          downloadBtn.classList.add('success');
+          setTimeout(() => {
+            span.textContent = originalText;
+            downloadBtn.classList.remove('success');
+          }, 2000);
+        }
+      }
+    });
+
+    // Copy text button
+    copyBtn?.addEventListener('click', async () => {
+      const textEl = document.getElementById('share-copy-text');
+      if (textEl) {
+        await navigator.clipboard.writeText(textEl.textContent || '');
+        const span = copyBtn.querySelector('span');
+        if (span) {
+          span.textContent = '已复制';
+          copyBtn.classList.add('copied');
+          setTimeout(() => {
+            span.textContent = '复制';
+            copyBtn.classList.remove('copied');
+          }, 2000);
+        }
+      }
+    });
+  }
+
+  function openShareModal(dataUrl: string, slug: string, skillTitle: string, category: string) {
+    const modal = document.getElementById('share-modal');
+    const previewImage = document.getElementById('share-preview-image') as HTMLImageElement;
+    const loadingEl = document.getElementById('share-preview-loading');
+    const copyTextEl = document.getElementById('share-copy-text');
+
+    if (!modal || !previewImage) return;
+
+    currentImageDataUrl = dataUrl;
+    currentSlug = slug;
+
+    // Set copy text
+    const outcome = outcomeMap[category] || '工作任务';
+    const copyText = `我用 Qoder +「Skills: ${skillTitle}」让 AI 帮我搞定了${outcome}! #qoder @qoder`;
+    if (copyTextEl) {
+      copyTextEl.textContent = copyText;
+    }
+
+    // Show modal with loading state
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    // Hide loading, show image
+    if (loadingEl) loadingEl.style.display = 'none';
+    previewImage.src = dataUrl;
+    previewImage.style.display = 'block';
+  }
+
+  // Share button functionality
+  function initShareButton() {
+    const shareBtn = document.getElementById('share-btn') as HTMLElement;
+    if (!shareBtn) return;
+
+    shareBtn.addEventListener('click', async () => {
+      const slug = shareBtn.dataset.slug || '';
+      const skillTitle = shareBtn.dataset.title || '';
+      const category = shareBtn.dataset.category || '';
+
+      // Show loading state on button
+      const originalText = shareBtn.innerHTML;
+      shareBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="spin"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 生成中...`;
+      shareBtn.setAttribute('disabled', 'true');
+
+      // Show modal with loading state
+      const modal = document.getElementById('share-modal');
+      const loadingEl = document.getElementById('share-preview-loading');
+      const previewImage = document.getElementById('share-preview-image') as HTMLImageElement;
+      
+      if (modal && loadingEl && previewImage) {
+        loadingEl.style.display = 'flex';
+        previewImage.style.display = 'none';
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      try {
+        const dataUrl = await generateShareImage({ slug, skillTitle, category });
+        openShareModal(dataUrl, slug, skillTitle, category);
+        
+        // Reset button state
+        shareBtn.innerHTML = originalText;
+        shareBtn.removeAttribute('disabled');
+      } catch (error) {
+        console.error('Failed to generate share image:', error);
+        // Close modal on error
+        if (modal) {
+          modal.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+        shareBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> 生成失败`;
+        setTimeout(() => {
+          shareBtn.innerHTML = originalText;
+          shareBtn.removeAttribute('disabled');
+        }, 2000);
+      }
+    });
+  }
+
+  // Helper functions for share image generation (inline for Astro compatibility)
+  function loadImage(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+      img.src = src;
+    });
+  }
+
+  async function imageExists(src: string): Promise<boolean> {
+    try {
+      const response = await fetch(src, { method: 'HEAD' });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  async function getShareImagePath(slug: string, category: string): Promise<string> {
+    const skillImagePath = `/images/skills/share/${slug}-share.png`;
+    const defaultImagePath = `/images/skills/share/default-${category}.png`;
+    
+    if (await imageExists(skillImagePath)) {
+      return skillImagePath;
+    }
+    return defaultImagePath;
+  }
+
+  function roundRect(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    radius: number
+  ): void {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+  }
+
+  async function generateShareImage(options: { slug: string; skillTitle: string; category: string }): Promise<string> {
+    const { slug, skillTitle, category } = options;
+    
+    const WIDTH = 900;
+    const HEIGHT = 1200;
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = WIDTH;
+    canvas.height = HEIGHT;
+    const ctx = canvas.getContext('2d');
+    
+    if (!ctx) {
+      throw new Error('Failed to get canvas context');
+    }
+    
+    const shareImagePath = await getShareImagePath(slug, category);
+    const [demoImage, logoImage] = await Promise.all([
+      loadImage(shareImagePath),
+      loadImage('/images/qoder-logo.png'),
+    ]);
+    
+    // ========== 1. Draw Background (Brand Green + Radial Gradient) ==========
+    const gradient = ctx.createRadialGradient(WIDTH / 2, HEIGHT / 2, 0, WIDTH / 2, HEIGHT / 2, HEIGHT * 0.7);
+    gradient.addColorStop(0, '#2EE065');  // Lighter center
+    gradient.addColorStop(1, '#2ADB5C');  // Brand green edge
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    
+    // ========== 2. Draw Subtle Radial Lines Texture ==========
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.lineWidth = 1.5;
+    const centerX = WIDTH / 2;
+    const centerY = HEIGHT * 0.42;
+    const numLines = 24;
+    const maxRadius = Math.max(WIDTH, HEIGHT);
+    
+    for (let i = 0; i < numLines; i++) {
+      const angle = (i / numLines) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(
+        centerX + Math.cos(angle) * maxRadius,
+        centerY + Math.sin(angle) * maxRadius
+      );
+      ctx.stroke();
+    }
+    ctx.restore();
+    
+    // ========== 3. Draw Top Left Label ==========
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    ctx.font = '600 28px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('宝藏工具分享', 50, 65);
+    
+    // ========== 4. Draw Main Title ==========
+    ctx.textAlign = 'center';
+    
+    // Line 1: "家人们谁懂啊！" (White)
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '700 46px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillText('家人们谁懂啊！', WIDTH / 2, 175);
+    
+    // Line 2: "Skills" (Black, larger) + "原来是这么玩的" (White)
+    const skillsText = 'Skills';
+    const restText = ' 原来是这么玩的';
+    
+    // Measure text widths
+    ctx.font = '900 64px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    const skillsWidth = ctx.measureText(skillsText).width;
+    ctx.font = '700 46px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    const restWidth = ctx.measureText(restText).width;
+    
+    const totalWidth = skillsWidth + restWidth;
+    const startX = (WIDTH - totalWidth) / 2;
+    
+    // Draw "Skills" in black
+    ctx.fillStyle = '#161616';
+    ctx.font = '900 64px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(skillsText, startX, 255);
+    
+    // Draw "原来是这么玩的" in white
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '700 46px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillText(restText, startX + skillsWidth, 255);
+    
+    // ========== 5. Draw Demo Image Card ==========
+    const demoWidth = 620;
+    const demoHeight = 480;
+    const demoX = (WIDTH - demoWidth) / 2;
+    const demoY = 320;  // More space from title
+    const cardPadding = 20;
+    const cardRadius = 24;
+    
+    // Card shadow - deeper and more prominent
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+    ctx.shadowBlur = 50;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 16;
+    
+    // White card background
+    ctx.fillStyle = '#FFFFFF';
+    roundRect(ctx, demoX - cardPadding, demoY - cardPadding, demoWidth + cardPadding * 2, demoHeight + cardPadding * 2, cardRadius);
+    ctx.fill();
+    ctx.restore();
+    
+    // Draw the demo image inside card
+    ctx.save();
+    roundRect(ctx, demoX, demoY, demoWidth, demoHeight, cardRadius - 6);
+    ctx.clip();
+    
+    const scale = Math.max(demoWidth / demoImage.width, demoHeight / demoImage.height);
+    const scaledWidth = demoImage.width * scale;
+    const scaledHeight = demoImage.height * scale;
+    const offsetX = (demoWidth - scaledWidth) / 2;
+    const offsetY = (demoHeight - scaledHeight) / 2;
+    
+    ctx.drawImage(demoImage, demoX + offsetX, demoY + offsetY, scaledWidth, scaledHeight);
+    ctx.restore();
+    
+    // ========== 6. Draw Skill Name Badge ==========
+    const badgeY = demoY + demoHeight + cardPadding + 45;
+    const badgeText = `Skills: ${skillTitle}`;
+    
+    ctx.font = '600 34px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    const badgeTextWidth = ctx.measureText(badgeText).width;
+    const badgePaddingX = 32;
+    const badgePaddingY = 16;
+    const badgeWidth = badgeTextWidth + badgePaddingX * 2;
+    const badgeHeight = 60;
+    const badgeX = (WIDTH - badgeWidth) / 2;
+    
+    // Black pill background
+    ctx.fillStyle = '#161616';
+    roundRect(ctx, badgeX, badgeY, badgeWidth, badgeHeight, badgeHeight / 2);
+    ctx.fill();
+    
+    // White text
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.fillText(badgeText, WIDTH / 2, badgeY + badgeHeight / 2 + 12);
+    
+    // ========== 7. Draw Subtitle (What it does) - Two lines with Qoder highlighted ==========
+    const outcome = outcomeMap[category] || '工作任务';
+    const subtitleY1 = badgeY + badgeHeight + 45;
+    const subtitleY2 = badgeY + badgeHeight + 75;
+    
+    // Line 1: "我用 " + "Qoder" (bold) + " +「Skills: xxx」"
+    const part1 = '我用 ';
+    const partQoder = 'Qoder';
+    const part3 = ` +「Skills: ${skillTitle}」`;
+    
+    // Measure text widths
+    ctx.font = '400 22px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    const part1Width = ctx.measureText(part1).width;
+    const part3Width = ctx.measureText(part3).width;
+    ctx.font = '700 22px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    const qoderWidth = ctx.measureText(partQoder).width;
+    
+    const totalLine1Width = part1Width + qoderWidth + part3Width;
+    const line1StartX = (WIDTH - totalLine1Width) / 2;
+    
+    // Draw part1 (normal)
+    ctx.font = '400 22px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.textAlign = 'left';
+    ctx.fillText(part1, line1StartX, subtitleY1);
+    
+    // Draw "Qoder" (bold + pure white)
+    ctx.font = '700 22px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(partQoder, line1StartX + part1Width, subtitleY1);
+    
+    // Draw part3 (normal)
+    ctx.font = '400 22px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.fillText(part3, line1StartX + part1Width + qoderWidth, subtitleY1);
+    
+    // Line 2: normal style
+    const subtitleLine2 = `让 AI 帮我搞定了${outcome}！`;
+    ctx.textAlign = 'center';
+    ctx.fillText(subtitleLine2, WIDTH / 2, subtitleY2);
+    
+    // ========== 8. Draw Bottom Left Branding (Logo + CTA + Domain) ==========
+    // Two-line layout: CTA text + URL for better call-to-action
+    const safePadding = 80;  // Safe margin for Xiaohongshu
+    const brandBaseY = HEIGHT - safePadding - 10;  // Adjusted for two lines
+    
+    // Logo sizing - slightly larger for prominence
+    const logoMaxWidth = 44;
+    const logoScale = Math.min(logoMaxWidth / logoImage.width, 1);
+    const logoWidth = logoImage.width * logoScale;
+    const logoHeight = logoImage.height * logoScale;
+    
+    // Text lines
+    const ctaLine1 = '立即去 Qoder 使用 Skills 吧：';
+    const ctaLine2 = 'www.qoder.com';
+    
+    // Spacing
+    const gap = 12;
+    const lineHeight = 28;
+    
+    // Draw logo (left-aligned, vertically centered with text block)
+    const logoX = safePadding;
+    const logoY = brandBaseY - logoHeight / 2 + 8;  // Center with the two lines
+    ctx.drawImage(logoImage, logoX, logoY, logoWidth, logoHeight);
+    
+    // Text X position (after logo)
+    const textX = logoX + logoWidth + gap;
+    
+    // Line 1: CTA text (lighter, smaller)
+    ctx.font = '400 18px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.textAlign = 'left';
+    ctx.fillText(ctaLine1, textX, brandBaseY - 4);
+    
+    // Line 2: URL (bolder, larger, more prominent)
+    ctx.font = '600 22px Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    ctx.fillText(ctaLine2, textX, brandBaseY + lineHeight - 4);
+    
+    return canvas.toDataURL('image/png', 1.0);
+  }
+
+  function downloadImage(dataUrl: string, filename: string): void {
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = dataUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  initCopyButtons();
+  initShareButton();
+  initShareModal();
+  document.addEventListener('astro:after-swap', () => {
+    initCopyButtons();
+    initShareButton();
+    initShareModal();
+  });
+</script>
+
+<style>
+  /* Import styles from the English version - these are duplicated for now */
+  /* In a production app, you'd want to extract these to a shared CSS file */
+  
+  .skill-detail-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-6) var(--space-16);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-6);
+  }
+
+  .breadcrumb a {
+    color: var(--text-tertiary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .breadcrumb a:hover {
+    color: var(--qoder-brand-green);
+  }
+
+  .breadcrumb .separator {
+    color: var(--border-subtle);
+  }
+
+  .breadcrumb .current {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .skill-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    background: var(--surface-elevated);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-8);
+  }
+
+  .header-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .skill-name {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-1);
+  }
+
+  .skill-title {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-4);
+  }
+
+  .skill-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+  }
+
+  .badge-official { background: rgba(42, 219, 92, 0.15); color: var(--qoder-brand-green-dark); }
+  .badge-popular { background: rgba(245, 158, 11, 0.15); color: #d97706; }
+  .badge-featured { background: rgba(139, 92, 246, 0.15); color: #7c3aed; }
+  .badge-category { background: var(--background-tertiary); color: var(--text-secondary); }
+  .source-anthropic { background: rgba(59, 130, 246, 0.1); color: #2563eb; }
+  .source-vercel { background: rgba(0, 0, 0, 0.08); color: var(--text-primary); }
+  .source-community { background: rgba(42, 219, 92, 0.1); color: var(--qoder-brand-green-dark); }
+  .source-enterprise { background: rgba(139, 92, 246, 0.1); color: #7c3aed; }
+
+  .header-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .header-actions :global(.btn),
+  .header-actions :global(a.btn) {
+    height: 48px !important;
+    min-height: 48px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+  }
+
+  .skill-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: var(--space-8);
+    margin-bottom: var(--space-12);
+  }
+
+  .skill-main { min-width: 0; }
+
+  .content-section {
+    margin-bottom: var(--space-8);
+  }
+
+  .content-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 2px solid var(--qoder-brand-green);
+  }
+
+  .lead-description {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0 0 var(--space-4);
+  }
+
+  .markdown-content {
+    color: var(--text-primary);
+    line-height: 1.7;
+  }
+
+  .markdown-content :global(h3) {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: var(--space-6) 0 var(--space-3);
+  }
+
+  .markdown-content :global(p) {
+    margin: 0 0 var(--space-4);
+  }
+
+  .markdown-content :global(ul) {
+    margin: 0 0 var(--space-4);
+    padding-left: var(--space-5);
+  }
+
+  .markdown-content :global(li) {
+    margin-bottom: var(--space-2);
+  }
+
+  .markdown-content :global(code) {
+    background: rgba(42, 219, 92, 0.1);
+    color: var(--qoder-brand-green-dark);
+    padding: 0.15em 0.4em;
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  .markdown-content :global(pre) {
+    background: #1a1a1c;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin: 0 0 var(--space-4);
+  }
+
+  .markdown-content :global(pre code) {
+    background: transparent;
+    color: #e5e5e5;
+    padding: 0;
+  }
+
+  /* Fix Expressive Code (Starlight) code block text color */
+  .markdown-content :global(figure.frame pre),
+  .markdown-content :global(figure.frame code),
+  .markdown-content :global(figure.frame .ec-line),
+  .markdown-content :global(figure.frame .ec-line .code),
+  .markdown-content :global(figure.frame .ec-line span) {
+    color: #e5e5e5 !important;
+  }
+
+  .roles-list, .tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .role-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--background-tertiary);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .skill-tag {
+    font-size: 0.8rem;
+    padding: var(--space-1) var(--space-3);
+    background: var(--surface-sunken);
+    border-radius: var(--radius-full);
+    color: var(--text-tertiary);
+  }
+
+  .skill-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .sidebar-card {
+    background: var(--surface-elevated);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+  }
+
+  .sidebar-card h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
+  }
+
+  .install-code {
+    position: relative;
+    background: #1a1a1c;
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    padding-right: var(--space-10);
+  }
+
+  .install-code code {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: #e5e5e5;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: #a0a0a0;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .copy-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+
+  .info-list { margin: 0; }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .info-item:last-child { border-bottom: none; }
+  .info-item dt { font-size: 0.875rem; color: var(--text-tertiary); }
+  .info-item dd { font-size: 0.875rem; font-weight: 500; color: var(--text-primary); margin: 0; }
+
+  .links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .links-list li { margin-bottom: var(--space-2); }
+  .links-list li:last-child { margin-bottom: 0; }
+
+  .links-list a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .links-list a:hover { color: var(--qoder-brand-green); }
+
+  .related-section { margin-bottom: var(--space-8); }
+
+  .related-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+  }
+
+  .related-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--surface-elevated);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all var(--duration-normal) var(--ease-out-expo);
+  }
+
+  .related-card:hover {
+    border-color: var(--qoder-brand-green);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .related-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .related-name {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .related-title {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+  }
+
+  .back-link { text-align: center; }
+
+  @media (max-width: 1024px) {
+    .skill-layout { grid-template-columns: 1fr; }
+    .skill-sidebar { order: -1; }
+    .related-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .skill-detail-page { padding: var(--space-4); }
+    .skill-header { flex-direction: column; padding: var(--space-5); }
+    .skill-name { font-size: 1.5rem; }
+    .header-actions { width: 100%; flex-direction: column; }
+    .header-actions .btn { width: 100%; justify-content: center; }
+  }
+
+  /* Share button loading animation */
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .spin {
+    animation: spin 1s linear infinite;
+  }
+
+  #share-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  /* ========================================
+     Share Modal Styles
+     ======================================== */
+  
+  .share-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .share-modal-overlay.active {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .share-modal {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 
+      0 0 0 1px rgba(0, 0, 0, 0.04),
+      0 24px 48px -12px rgba(0, 0, 0, 0.25),
+      0 0 80px -20px rgba(42, 219, 92, 0.15);
+    transform: scale(0.95) translateY(10px);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .share-modal-overlay.active .share-modal {
+    transform: scale(1) translateY(0);
+  }
+
+  /* Close button */
+  .share-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .share-modal-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #1f2937;
+  }
+
+  /* Header */
+  .share-modal-header {
+    padding: 32px 32px 0;
+    text-align: center;
+  }
+
+  .share-modal-header h2 {
+    margin: 0 0 6px;
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.02em;
+  }
+
+  .share-modal-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  /* Body */
+  .share-modal-body {
+    padding: 24px 32px;
+  }
+
+  /* Preview container */
+  .share-preview-container {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    max-height: 320px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .share-preview-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #9ca3af;
+    font-size: 0.875rem;
+  }
+
+  .share-preview-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top-color: var(--qoder-brand-green, #2ADB5C);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .share-preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: none;
+  }
+
+  /* Copy section */
+  .share-copy-section {
+    margin-bottom: 20px;
+  }
+
+  .share-copy-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .share-copy-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+  }
+
+  .share-copy-text {
+    flex: 1;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #374151;
+    word-break: break-all;
+  }
+
+  .share-copy-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .share-copy-btn:hover {
+    border-color: #d1d5db;
+    color: #374151;
+  }
+
+  .share-copy-btn.copied {
+    border-color: var(--qoder-brand-green, #2ADB5C);
+    background: rgba(42, 219, 92, 0.08);
+    color: var(--qoder-brand-green-dark, #1a8a3a);
+  }
+
+  .share-copy-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Guide section */
+  .share-guide-section {
+    padding: 16px;
+    background: linear-gradient(135deg, rgba(42, 219, 92, 0.06) 0%, rgba(42, 219, 92, 0.02) 100%);
+    border: 1px solid rgba(42, 219, 92, 0.15);
+    border-radius: 10px;
+  }
+
+  .share-guide-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--qoder-brand-green-dark, #1a8a3a);
+    margin-bottom: 10px;
+  }
+
+  .share-guide-steps {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 0.85rem;
+    color: #4b5563;
+    line-height: 1.7;
+  }
+
+  .share-guide-steps li {
+    margin-bottom: 2px;
+  }
+
+  .share-guide-steps li::marker {
+    color: var(--qoder-brand-green, #2ADB5C);
+    font-weight: 600;
+  }
+
+  /* Footer */
+  .share-modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 0 32px 32px;
+    align-items: stretch;
+  }
+
+  .share-download-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 24px !important;
+    margin: 0 !important;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--qoder-brand-green, #2ADB5C) 0%, #22c55e 100%);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px -2px rgba(42, 219, 92, 0.4);
+    box-sizing: border-box !important;
+  }
+
+  .share-download-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px -2px rgba(42, 219, 92, 0.5);
+  }
+
+  .share-download-btn:active {
+    transform: translateY(0);
+  }
+
+  .share-download-btn.success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  }
+
+  .share-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 24px !important;
+    margin: 0 !important;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box !important;
+  }
+
+  .share-close-btn:hover {
+    border-color: #d1d5db;
+    color: #374151;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .share-modal-overlay {
+      padding: var(--space-3);
+      align-items: flex-end;
+    }
+
+    .share-modal {
+      max-width: 100%;
+      max-height: 85vh;
+      border-radius: 20px 20px 0 0;
+      transform: translateY(100%);
+    }
+
+    .share-modal-overlay.active .share-modal {
+      transform: translateY(0);
+    }
+
+    .share-modal-header,
+    .share-modal-body,
+    .share-modal-footer {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .share-preview-container {
+      max-height: 260px;
+    }
+
+    .share-modal-footer {
+      flex-direction: column;
+    }
+
+    .share-close-btn {
+      order: 1;
+    }
+  }
+</style>

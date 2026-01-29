@@ -1,0 +1,204 @@
+---
+/**
+ * SkillFilter Component - Category filter pills
+ * Allows filtering skills by category
+ */
+import { ui, defaultLang, useTranslations, getCategoryLabel } from '../i18n';
+
+interface Props {
+  activeCategory?: string;
+  counts?: Record<string, number>;
+  lang?: keyof typeof ui;
+}
+
+const { activeCategory = 'all', counts = {}, lang = defaultLang } = Astro.props;
+const t = useTranslations(lang);
+
+const categoryIds = ['all', 'document', 'development', 'design', 'automation', 'marketing', 'data', 'security', 'productivity', 'meta'];
+const categories = categoryIds.map(id => ({
+  id,
+  label: id === 'all' ? t('filter.all') : getCategoryLabel(id, lang),
+}));
+---
+
+<div class="skill-filter" data-filter-component>
+  <div class="filter-pills">
+    {categories.map((cat) => (
+      <button 
+        class={`filter-pill ${activeCategory === cat.id ? 'active' : ''}`}
+        data-category={cat.id}
+        type="button"
+      >
+        <span class="pill-label">{cat.label}</span>
+        {counts[cat.id] !== undefined && (
+          <span class="pill-count">{counts[cat.id]}</span>
+        )}
+      </button>
+    ))}
+  </div>
+</div>
+
+<script>
+  function initSkillFilter() {
+    const filterComponent = document.querySelector('[data-filter-component]');
+    if (!filterComponent) return;
+
+    const pills = filterComponent.querySelectorAll('.filter-pill');
+    const skillCards = document.querySelectorAll('[data-skill-category]');
+
+    // Apply initial inline styles to ensure correct border color
+    pills.forEach(p => {
+      const btn = p as HTMLElement;
+      if (btn.classList.contains('active')) {
+        btn.style.borderColor = '#2ADB5C';
+        btn.style.backgroundColor = '#2ADB5C';
+        btn.style.color = '#ffffff';
+      } else {
+        btn.style.borderColor = '#3F5B54';
+        btn.style.backgroundColor = '';
+        btn.style.color = '#3F5B54';
+      }
+    });
+
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        const category = pill.getAttribute('data-category');
+        
+        // Update active state with inline styles
+        pills.forEach(p => {
+          const btn = p as HTMLElement;
+          btn.classList.remove('active');
+          btn.style.borderColor = '#3F5B54';
+          btn.style.backgroundColor = '';
+          btn.style.color = '#3F5B54';
+        });
+        (pill as HTMLElement).classList.add('active');
+        (pill as HTMLElement).style.borderColor = '#2ADB5C';
+        (pill as HTMLElement).style.backgroundColor = '#2ADB5C';
+        (pill as HTMLElement).style.color = '#ffffff';
+
+        // Filter cards
+        skillCards.forEach(card => {
+          const cardCategory = card.getAttribute('data-skill-category');
+          if (category === 'all' || cardCategory === category) {
+            (card as HTMLElement).style.display = '';
+          } else {
+            (card as HTMLElement).style.display = 'none';
+          }
+        });
+
+        // Update URL without reload
+        const url = new URL(window.location.href);
+        if (category === 'all') {
+          url.searchParams.delete('category');
+        } else {
+          url.searchParams.set('category', category);
+        }
+        window.history.replaceState({}, '', url.toString());
+      });
+    });
+
+    // Initialize from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialCategory = urlParams.get('category');
+    if (initialCategory) {
+      const targetPill = filterComponent.querySelector(`[data-category="${initialCategory}"]`);
+      if (targetPill) {
+        (targetPill as HTMLElement).click();
+      }
+    }
+  }
+
+  initSkillFilter();
+  document.addEventListener('astro:after-swap', initSkillFilter);
+</script>
+
+<style>
+  .skill-filter {
+    margin-bottom: var(--space-8);
+  }
+
+  .filter-pills {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .filter-pills button.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 16px;
+    margin: 0 !important;
+    background: var(--surface-elevated, #ffffff);
+    border: 1px solid #3F5B54 !important;
+    border-radius: 9999px;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #3F5B54;
+    cursor: pointer;
+    transition: all 0.15s ease-out;
+    white-space: nowrap;
+    line-height: 1.2;
+    height: 36px;
+    box-sizing: border-box;
+  }
+
+  .filter-pills button.filter-pill:hover {
+    border-color: #2ADB5C !important;
+    color: var(--text-primary, #1a1a1c);
+    background: var(--hover-bg, #f5f5f5);
+  }
+
+  .filter-pills button.filter-pill.active {
+    background: #2ADB5C !important;
+    border-color: #2ADB5C !important;
+    color: #ffffff !important;
+  }
+
+  .filter-pills button.filter-pill.active .pill-count {
+    background: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+  }
+
+  .pill-label {
+    font-weight: 600;
+  }
+
+  .pill-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    background: var(--background-tertiary);
+    color: var(--text-tertiary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: var(--radius-full);
+    line-height: 1;
+  }
+
+  @media (max-width: 768px) {
+    .filter-pills {
+      justify-content: flex-start;
+      overflow-x: auto;
+      padding-bottom: var(--space-2);
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .filter-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-pill {
+      flex-shrink: 0;
+    }
+  }
+</style>

@@ -1,0 +1,221 @@
+---
+/**
+ * SkillCard Component - Display a single skill in a card format
+ * Shows name, description, source, category, and tags
+ */
+import type { CollectionEntry } from 'astro:content';
+import { ui, defaultLang, useTranslations, getCategoryLabel, getSourceLabel, getSkillDisplayName, getSkillTitle, getSkillDescription } from '../i18n';
+
+interface Props {
+  entry: CollectionEntry<'skills'>;
+  lang?: keyof typeof ui;
+}
+
+const { entry, lang = defaultLang } = Astro.props;
+const { data, slug } = entry;
+const t = useTranslations(lang);
+
+// Get translated labels
+const categoryLabel = getCategoryLabel(data.category, lang);
+const sourceLabel = getSourceLabel(data.source, lang);
+
+// Get translated skill content
+const displayName = getSkillDisplayName(slug, data.name, lang);
+const displayTitle = getSkillTitle(slug, data.title, lang);
+const displayDescription = getSkillDescription(slug, data.description, lang);
+
+// Source class config
+const sourceClassConfig: Record<string, string> = {
+  anthropic: 'source-anthropic',
+  vercel: 'source-vercel',
+  community: 'source-community',
+  enterprise: 'source-enterprise',
+};
+const sourceClass = sourceClassConfig[data.source] || 'source-community';
+
+// Language prefix for links
+const langPrefix = lang === 'zh-CN' ? '/zh' : '';
+---
+
+<a href={`${langPrefix}/skills/${slug}/`} class="skill-card hover-lift">
+  <div class="skill-card-header">
+    <div class="skill-badges">
+      {data.isOfficial && <span class="badge badge-official">{t('badge.official')}</span>}
+      {data.popular && <span class="badge badge-popular">{t('badge.popular')}</span>}
+      {data.featured && <span class="badge badge-featured">{t('badge.featured')}</span>}
+    </div>
+  </div>
+  
+  <div class="skill-card-body">
+    <h3 class="skill-name">{displayName}</h3>
+    <p class="skill-title">{displayTitle}</p>
+    <p class="skill-description">{displayDescription}</p>
+  </div>
+  
+  <div class="skill-card-footer">
+    <span class={`source-tag ${sourceClass}`}>{sourceLabel}</span>
+    <span class="category-tag">{categoryLabel}</span>
+  </div>
+</a>
+
+<style>
+  .skill-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-elevated);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    text-decoration: none;
+    transition: all var(--duration-normal) var(--ease-out-expo);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-brand);
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-out);
+  }
+
+  .skill-card:hover {
+    border-color: var(--qoder-brand-green);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(42, 219, 92, 0.1);
+    transform: translateY(-4px);
+  }
+
+  .skill-card:hover::before {
+    opacity: 1;
+  }
+
+  .skill-card-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    margin-bottom: var(--space-3);
+    min-height: 24px;
+  }
+
+  .skill-badges {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .skill-badges > * {
+    margin: 0 !important;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+  }
+
+  .badge-official {
+    background: rgba(42, 219, 92, 0.15);
+    color: var(--qoder-brand-green-dark);
+  }
+
+  .badge-popular {
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+  }
+
+  .badge-featured {
+    background: rgba(139, 92, 246, 0.15);
+    color: #7c3aed;
+  }
+
+  .skill-card-body {
+    flex: 1;
+    margin-bottom: var(--space-4);
+  }
+
+  .skill-name {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-1);
+    letter-spacing: -0.01em;
+  }
+
+  .skill-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--qoder-brand-green-dark);
+    margin: 0 0 var(--space-3);
+  }
+
+  .skill-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .skill-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--structural-teal);
+    opacity: 0.3;
+  }
+
+  .skill-card-footer > * {
+    margin: 0 !important;
+  }
+
+  .source-tag {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+  }
+
+  .source-anthropic {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+  }
+
+  .source-vercel {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--text-primary);
+  }
+
+  .source-community {
+    background: rgba(42, 219, 92, 0.1);
+    color: var(--qoder-brand-green-dark);
+  }
+
+  .source-enterprise {
+    background: rgba(139, 92, 246, 0.1);
+    color: #7c3aed;
+  }
+
+  .category-tag {
+    font-size: 0.75rem;
+    color: var(--structural-teal);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+</style>

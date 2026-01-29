@@ -1,0 +1,152 @@
+---
+/**
+ * Agents Page - Coming Soon (Chinese)
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+---
+
+<StarlightPage 
+  frontmatter={{ 
+    title: 'Agents - 即将上线',
+    description: '社区 agents.md 配置 - 即将上线',
+    template: 'splash',
+    tableOfContents: false,
+  }}
+>
+  <div class="coming-soon-page">
+    <div class="coming-soon-content animate-fade-in-up">
+      <div class="icon-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 8V4H8"/>
+          <rect width="16" height="12" x="4" y="8" rx="2"/>
+          <path d="M2 14h2"/>
+          <path d="M20 14h2"/>
+          <path d="M15 13v2"/>
+          <path d="M9 13v2"/>
+        </svg>
+      </div>
+      <h1 class="page-title">Agents</h1>
+      <p class="coming-soon-badge">即将上线</p>
+      <p class="page-description">
+        探索社区贡献的 <code>agents.md</code> 配置，适用于不同技术栈和使用场景。
+        分享你的配置，帮助其他人更快地编程。
+      </p>
+      <div class="cta-buttons">
+        <a href="/zh/skills/" class="btn primary">
+          探索技能
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</StarlightPage>
+
+<style>
+  .coming-soon-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-20) var(--space-8);
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .coming-soon-content {
+    text-align: center;
+  }
+
+  .icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    background: var(--gradient-subtle);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-8);
+    color: var(--qoder-brand-green);
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
+    letter-spacing: -0.02em;
+  }
+
+  .coming-soon-badge {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    background: var(--qoder-brand-green-glass);
+    border: 1px solid var(--qoder-brand-green);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--qoder-brand-green);
+    margin-bottom: var(--space-6);
+  }
+
+  .page-description {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin: 0 auto var(--space-8);
+  }
+
+  .page-description code {
+    background: var(--surface-elevated);
+    padding: 0.15em 0.4em;
+    border-radius: var(--radius-sm);
+    font-size: 0.9em;
+  }
+
+  .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .btn.primary {
+    background: var(--qoder-brand-green);
+    color: var(--text-on-brand);
+  }
+
+  .btn.primary:hover {
+    background: var(--qoder-brand-green-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-sm);
+  }
+
+  @media (max-width: 768px) {
+    .coming-soon-page {
+      padding: var(--space-12) var(--space-4);
+    }
+
+    .icon-wrapper {
+      width: 100px;
+      height: 100px;
+    }
+
+    .icon-wrapper svg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+</style>

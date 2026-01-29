@@ -1,0 +1,746 @@
+---
+/**
+ * Skill Detail Page - Individual skill information
+ * Shows full description, install command, links, and related skills
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { getLangFromPath, useTranslations, formatDate, getCategoryLabel, getSourceLabel, getRoleLabel } from '../../i18n';
+
+export async function getStaticPaths() {
+  const skills = await getCollection('skills', ({ id }) => !id.startsWith('_'));
+  return skills.map(skill => ({
+    params: { slug: skill.slug },
+    props: { skill },
+  }));
+}
+
+interface Props {
+  skill: CollectionEntry<'skills'>;
+}
+
+const { skill } = Astro.props;
+const { Content } = await skill.render();
+
+// Get current language
+const lang = getLangFromPath(Astro.url.pathname);
+const t = useTranslations(lang);
+const langPrefix = lang === 'zh-CN' ? '/zh' : '';
+
+// Get related skills (same category, excluding current)
+const allSkills = await getCollection('skills', ({ id }) => !id.startsWith('_'));
+const relatedSkills = allSkills
+  .filter(s => s.data.category === skill.data.category && s.slug !== skill.slug)
+  .slice(0, 3);
+
+// Get translated labels
+const categoryLabel = getCategoryLabel(skill.data.category, lang);
+const sourceLabel = getSourceLabel(skill.data.source, lang);
+
+// Source class config
+const sourceClassConfig: Record<string, string> = {
+  anthropic: 'source-anthropic',
+  vercel: 'source-vercel',
+  community: 'source-community',
+  enterprise: 'source-enterprise',
+};
+const sourceClass = sourceClassConfig[skill.data.source] || 'source-community';
+---
+
+<StarlightPage 
+  frontmatter={{ 
+    title: `${skill.data.name} - ${skill.data.title}`,
+    description: skill.data.description,
+    template: 'splash',
+    tableOfContents: false,
+  }}
+>
+  <div class="skill-detail-page">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb animate-fade-in">
+      <a href={`${langPrefix}/skills/`}>{t('nav.skills')}</a>
+      <span class="separator">/</span>
+      <a href={`${langPrefix}/skills/?category=${skill.data.category}`}>{categoryLabel}</a>
+      <span class="separator">/</span>
+      <span class="current">{skill.data.name}</span>
+    </nav>
+
+    <!-- Skill Header -->
+    <header class="skill-header animate-fade-in-up">
+      <div class="header-content">
+        <h1 class="skill-name">{skill.data.name}</h1>
+        <p class="skill-title">{skill.data.title}</p>
+        <div class="skill-badges">
+          {skill.data.isOfficial && <span class="badge badge-official">{t('badge.official')}</span>}
+          {skill.data.popular && <span class="badge badge-popular">{t('badge.popular')}</span>}
+          {skill.data.featured && <span class="badge badge-featured">{t('badge.featured')}</span>}
+          <span class={`badge ${sourceClass}`}>{sourceLabel}</span>
+          <span class="badge badge-category">{categoryLabel}</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href={skill.data.githubUrl} target="_blank" rel="noopener" class="btn secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          {t('common.github')}
+        </a>
+        <button class="btn primary" data-copy-install data-copied-text={t('skill.copied')}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          {t('skill.copyInstallCommand')}
+        </button>
+      </div>
+    </header>
+
+    <!-- Two-column layout -->
+    <div class="skill-layout">
+      <!-- Main Content -->
+      <main class="skill-main animate-fade-in-up">
+        <section class="content-section">
+          <h2>{t('skill.description')}</h2>
+          <p class="lead-description">{skill.data.description}</p>
+          <div class="markdown-content">
+            <Content />
+          </div>
+        </section>
+
+        {skill.data.roles && skill.data.roles.length > 0 && (
+          <section class="content-section">
+            <h2>{t('skill.applicableRoles')}</h2>
+            <div class="roles-list">
+              {skill.data.roles.map(roleId => (
+                <span class="role-tag">
+                  {getRoleLabel(roleId, lang)}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {skill.data.tags && skill.data.tags.length > 0 && (
+          <section class="content-section">
+            <h2>{t('skill.tags')}</h2>
+            <div class="tags-list">
+              {skill.data.tags.map(tag => (
+                <span class="skill-tag">{tag}</span>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+
+      <!-- Sidebar -->
+      <aside class="skill-sidebar animate-fade-in-up">
+        <!-- Install Card -->
+        <div class="sidebar-card">
+          <h3>{t('skill.install')}</h3>
+          <div class="install-code" data-install-command>
+            <code>{skill.data.installCommand || `git clone ${skill.data.githubUrl}\ncp -r ${skill.data.name} ~/.qoder/skills/`}</code>
+            <button class="copy-btn" data-copy-btn title="Copy">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="sidebar-card">
+          <h3>{t('skill.information')}</h3>
+          <dl class="info-list">
+            <div class="info-item">
+              <dt>{t('info.source')}</dt>
+              <dd>{sourceLabel}</dd>
+            </div>
+            {skill.data.author && (
+              <div class="info-item">
+                <dt>{t('info.author')}</dt>
+                <dd>{skill.data.author}</dd>
+              </div>
+            )}
+            <div class="info-item">
+              <dt>{t('info.category')}</dt>
+              <dd>{categoryLabel}</dd>
+            </div>
+            <div class="info-item">
+              <dt>{t('info.dateAdded')}</dt>
+              <dd>{formatDate(skill.data.date, lang)}</dd>
+            </div>
+            {skill.data.lastUpdated && (
+              <div class="info-item">
+                <dt>{t('info.lastUpdated')}</dt>
+                <dd>{formatDate(skill.data.lastUpdated, lang)}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
+
+        <!-- Links Card -->
+        <div class="sidebar-card">
+          <h3>{t('skill.links')}</h3>
+          <ul class="links-list">
+            <li>
+              <a href={skill.data.githubUrl} target="_blank" rel="noopener">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                {t('skill.githubRepository')}
+              </a>
+            </li>
+            {skill.data.docsUrl && (
+              <li>
+                <a href={skill.data.docsUrl} target="_blank" rel="noopener">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                  {t('skill.documentation')}
+                </a>
+              </li>
+            )}
+            {skill.data.marketplaceUrl && (
+              <li>
+                <a href={skill.data.marketplaceUrl} target="_blank" rel="noopener">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                  {t('skill.marketplace')}
+                </a>
+              </li>
+            )}
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Related Skills -->
+    {relatedSkills.length > 0 && (
+      <section class="related-section animate-fade-in-up">
+        <h2>{t('skill.relatedSkills')}</h2>
+        <div class="related-grid">
+          {relatedSkills.map(related => (
+            <a href={`${langPrefix}/skills/${related.slug}/`} class="related-card hover-lift">
+              <div class="related-content">
+                <span class="related-name">{related.data.name}</span>
+                <span class="related-title">{related.data.title}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Back Link -->
+    <div class="back-link">
+      <a href={`${langPrefix}/skills/`} class="btn ghost">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        {t('skill.backToSkills')}
+      </a>
+    </div>
+  </div>
+</StarlightPage>
+
+<script>
+  function initCopyButtons() {
+    // Copy button in install code block
+    const copyBtns = document.querySelectorAll('[data-copy-btn]');
+    copyBtns.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const codeBlock = btn.closest('[data-install-command]');
+        const code = codeBlock?.querySelector('code')?.textContent;
+        if (code) {
+          await navigator.clipboard.writeText(code);
+          btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+          setTimeout(() => {
+            btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+          }, 2000);
+        }
+      });
+    });
+
+    // Header copy install button
+    const headerCopyBtn = document.querySelector('[data-copy-install]') as HTMLElement;
+    headerCopyBtn?.addEventListener('click', async () => {
+      const codeBlock = document.querySelector('[data-install-command] code');
+      const code = codeBlock?.textContent;
+      if (code) {
+        await navigator.clipboard.writeText(code);
+        const originalText = headerCopyBtn.innerHTML;
+        const copiedText = headerCopyBtn.dataset.copiedText || 'Copied!';
+        headerCopyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${copiedText}`;
+        setTimeout(() => {
+          headerCopyBtn.innerHTML = originalText;
+        }, 2000);
+      }
+    });
+  }
+
+  initCopyButtons();
+  document.addEventListener('astro:after-swap', initCopyButtons);
+</script>
+
+<style>
+  .skill-detail-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-6) var(--space-16);
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-6);
+  }
+
+  .breadcrumb a {
+    color: var(--text-tertiary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .breadcrumb a:hover {
+    color: var(--qoder-brand-green);
+  }
+
+  .breadcrumb .separator {
+    color: var(--border-subtle);
+  }
+
+  .breadcrumb .current {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* Skill Header */
+  .skill-header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-6);
+    padding: var(--space-8);
+    background: var(--surface-elevated);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-8);
+  }
+
+  .header-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .skill-name {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-1);
+  }
+
+  .skill-title {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-4);
+  }
+
+  .skill-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+  }
+
+  .badge-official {
+    background: rgba(42, 219, 92, 0.15);
+    color: var(--qoder-brand-green-dark);
+  }
+
+  .badge-popular {
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+  }
+
+  .badge-featured {
+    background: rgba(139, 92, 246, 0.15);
+    color: #7c3aed;
+  }
+
+  .badge-category {
+    background: var(--background-tertiary);
+    color: var(--text-secondary);
+  }
+
+  .source-anthropic {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+  }
+
+  .source-vercel {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--text-primary);
+  }
+
+  .source-community {
+    background: rgba(42, 219, 92, 0.1);
+    color: var(--qoder-brand-green-dark);
+  }
+
+  .source-enterprise {
+    background: rgba(139, 92, 246, 0.1);
+    color: #7c3aed;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-shrink: 0;
+  }
+
+  /* Two-column Layout */
+  .skill-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: var(--space-8);
+    margin-bottom: var(--space-12);
+  }
+
+  /* Main Content */
+  .skill-main {
+    min-width: 0;
+  }
+
+  .content-section {
+    margin-bottom: var(--space-8);
+  }
+
+  .content-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 2px solid var(--qoder-brand-green);
+  }
+
+  .lead-description {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin: 0 0 var(--space-4);
+  }
+
+  .markdown-content {
+    color: var(--text-primary);
+    line-height: 1.7;
+  }
+
+  .markdown-content :global(h3) {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: var(--space-6) 0 var(--space-3);
+  }
+
+  .markdown-content :global(p) {
+    margin: 0 0 var(--space-4);
+  }
+
+  .markdown-content :global(ul) {
+    margin: 0 0 var(--space-4);
+    padding-left: var(--space-5);
+  }
+
+  .markdown-content :global(li) {
+    margin-bottom: var(--space-2);
+  }
+
+  .markdown-content :global(code) {
+    background: rgba(42, 219, 92, 0.1);
+    color: var(--qoder-brand-green-dark);
+    padding: 0.15em 0.4em;
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+
+  .markdown-content :global(pre) {
+    background: #1a1a1c;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin: 0 0 var(--space-4);
+  }
+
+  .markdown-content :global(pre code) {
+    background: transparent;
+    color: #e5e5e5;
+    padding: 0;
+  }
+
+  /* Fix Expressive Code (Starlight) code block text color */
+  .markdown-content :global(figure.frame pre),
+  .markdown-content :global(figure.frame code),
+  .markdown-content :global(figure.frame .ec-line),
+  .markdown-content :global(figure.frame .ec-line .code),
+  .markdown-content :global(figure.frame .ec-line span) {
+    color: #e5e5e5 !important;
+  }
+
+  /* Roles List */
+  .roles-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .role-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--background-tertiary);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .role-icon {
+    font-size: 1rem;
+  }
+
+  /* Tags List */
+  .tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .skill-tag {
+    font-size: 0.8rem;
+    padding: var(--space-1) var(--space-3);
+    background: var(--surface-sunken);
+    border-radius: var(--radius-full);
+    color: var(--text-tertiary);
+  }
+
+  /* Sidebar */
+  .skill-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .sidebar-card {
+    background: var(--surface-elevated);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+  }
+
+  .sidebar-card h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
+  }
+
+  /* Install Code */
+  .install-code {
+    position: relative;
+    background: #1a1a1c;
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    padding-right: var(--space-10);
+  }
+
+  .install-code code {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: #e5e5e5;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: #a0a0a0;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .copy-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+
+  /* Info List */
+  .info-list {
+    margin: 0;
+  }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .info-item:last-child {
+    border-bottom: none;
+  }
+
+  .info-item dt {
+    font-size: 0.875rem;
+    color: var(--text-tertiary);
+  }
+
+  .info-item dd {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  /* Links List */
+  .links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .links-list li {
+    margin-bottom: var(--space-2);
+  }
+
+  .links-list li:last-child {
+    margin-bottom: 0;
+  }
+
+  .links-list a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .links-list a:hover {
+    color: var(--qoder-brand-green);
+  }
+
+  /* Related Section */
+  .related-section {
+    margin-bottom: var(--space-8);
+  }
+
+  .related-section h2 {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+  }
+
+  .related-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--surface-elevated);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    transition: all var(--duration-normal) var(--ease-out-expo);
+  }
+
+  .related-card:hover {
+    border-color: var(--qoder-brand-green);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .related-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .related-name {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .related-title {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+  }
+
+  /* Back Link */
+  .back-link {
+    text-align: center;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .skill-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .skill-sidebar {
+      order: -1;
+    }
+
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .skill-detail-page {
+      padding: var(--space-4);
+    }
+
+    .skill-header {
+      flex-direction: column;
+      padding: var(--space-5);
+    }
+
+    .header-icon {
+      font-size: 3rem;
+    }
+
+    .skill-name {
+      font-size: 1.5rem;
+    }
+
+    .header-actions {
+      width: 100%;
+      flex-direction: column;
+    }
+
+    .header-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>

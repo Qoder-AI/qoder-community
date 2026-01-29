@@ -1,0 +1,370 @@
+---
+/**
+ * AgentCard - Flip card component for agents.md configurations
+ * Front: Shows agent title, author, tags
+ * Back: Shows scrollable agents.md content preview
+ */
+import type { CollectionEntry } from 'astro:content';
+
+export interface Props {
+  entry: CollectionEntry<'agents'>;
+}
+
+const { entry } = Astro.props;
+const { title, description, author, githubUrl, tags, category } = entry.data;
+const { Content } = await entry.render();
+---
+
+<div class="agent-card-wrapper">
+  <div class="agent-card">
+    <!-- Front Face -->
+    <div class="agent-card-front">
+      <div class="agent-header">
+        <div class="author-info">
+          <img src={author.avatar} alt={author.name} class="author-avatar" />
+          <span class="author-name">{author.name}</span>
+        </div>
+        <a href={githubUrl} target="_blank" rel="noopener noreferrer" class="github-link" aria-label="View on GitHub">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+        </a>
+      </div>
+      
+      <div class="agent-content">
+        <h3 class="agent-title">{title}</h3>
+        <p class="agent-description">{description}</p>
+        
+        <div class="agent-meta">
+          <span class="category-badge">{category}</span>
+        </div>
+        
+        <div class="agent-tags">
+          {tags.map(tag => <span class="tag">{tag}</span>)}
+        </div>
+        
+        <div class="flip-hint">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Hover to view configuration
+        </div>
+      </div>
+    </div>
+    
+    <!-- Back Face -->
+    <div class="agent-card-back">
+      <div class="back-header">
+        <h4>{title}</h4>
+        <a href={githubUrl} target="_blank" rel="noopener noreferrer" class="view-github-btn">
+          View on GitHub →
+        </a>
+      </div>
+      <div class="code-preview">
+        <Content />
+      </div>
+      <div class="scroll-indicator">Scroll for more</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .agent-card-wrapper {
+    perspective: 1000px;
+    width: 100%;
+  }
+
+  .agent-card {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    transform-style: preserve-3d;
+    transition: transform var(--duration-slow) var(--ease-out);
+  }
+
+  .agent-card-wrapper:hover .agent-card {
+    transform: rotateY(180deg);
+  }
+
+  .agent-card-front,
+  .agent-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    overflow: hidden;
+  }
+
+  /* Front Face Styles - Light Theme */
+  .agent-card-front {
+    background: var(--surface-elevated);
+    border: 1px solid var(--structural-teal);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--duration-normal) var(--ease-out),
+                border-color var(--duration-normal) var(--ease-out);
+  }
+
+  .agent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+  }
+
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .author-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    border: 2px solid var(--qoder-brand-green);
+  }
+
+  .author-name {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .github-link {
+    color: var(--text-tertiary);
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .github-link:hover {
+    color: var(--qoder-brand-green);
+  }
+
+  .agent-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .agent-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-3);
+    letter-spacing: -0.01em;
+  }
+
+  .agent-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 var(--space-4);
+    flex: 1;
+  }
+
+  .agent-meta {
+    margin-bottom: var(--space-3);
+  }
+
+  .category-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--overlay-brand);
+    color: var(--qoder-brand-green-dark);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(42, 219, 92, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .agent-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .agent-tags > * {
+    margin: 0 !important;
+  }
+
+  .tag {
+    padding: var(--space-1) var(--space-3);
+    background: var(--background-primary);
+    color: var(--structural-teal);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--structural-teal);
+    opacity: 0.8;
+  }
+
+  .flip-hint {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.8rem;
+    color: var(--structural-teal);
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--structural-teal);
+    opacity: 0.5;
+  }
+
+  .flip-hint svg {
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-4px); }
+  }
+
+  /* Back Face Styles - Dark for code contrast */
+  .agent-card-back {
+    background: var(--structural-navy);
+    border: 1px solid var(--qoder-brand-green);
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    max-height: 500px;
+  }
+
+  .back-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid rgba(42, 219, 92, 0.3);
+  }
+
+  .back-header h4 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--qoder-brand-green);
+    margin: 0;
+  }
+
+  .view-github-btn {
+    font-size: 0.8rem;
+    color: var(--qoder-brand-green);
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .view-github-btn:hover {
+    transform: translateX(4px);
+  }
+
+  .code-preview {
+    flex: 1;
+    overflow-y: auto;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: #E5E7EB;
+    background: var(--structural-charcoal);
+    padding: var(--space-4);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-3);
+  }
+
+  /* Code preview content styling - scoped to avoid conflicts */
+  .agent-card-back .code-preview h1,
+  .agent-card-back .code-preview h2,
+  .agent-card-back .code-preview h3,
+  .agent-card-back .code-preview :global(h1),
+  .agent-card-back .code-preview :global(h2),
+  .agent-card-back .code-preview :global(h3) {
+    color: var(--qoder-brand-green);
+    font-size: 0.9rem;
+    margin: var(--space-4) 0 var(--space-2);
+    font-weight: 600;
+  }
+
+  .agent-card-back .code-preview p,
+  .agent-card-back .code-preview :global(p) {
+    color: #E5E7EB;
+    margin: var(--space-2) 0;
+  }
+
+  .agent-card-back .code-preview ul,
+  .agent-card-back .code-preview ol,
+  .agent-card-back .code-preview :global(ul),
+  .agent-card-back .code-preview :global(ol) {
+    margin: var(--space-2) 0;
+    padding-left: var(--space-6);
+  }
+
+  .agent-card-back .code-preview li,
+  .agent-card-back .code-preview :global(li) {
+    color: #E5E7EB;
+    margin: var(--space-1) 0;
+  }
+
+  .agent-card-back .code-preview code,
+  .agent-card-back .code-preview :global(code) {
+    background: rgba(42, 219, 92, 0.1);
+    color: var(--qoder-brand-green);
+    padding: 0.2em 0.4em;
+    border-radius: var(--radius-xs);
+    font-size: 0.85em;
+  }
+
+  .code-preview::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .code-preview::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-xs);
+  }
+
+  .code-preview::-webkit-scrollbar-thumb {
+    background: var(--qoder-brand-green);
+    border-radius: var(--radius-xs);
+  }
+
+  .scroll-indicator {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #6B7280;
+    font-style: italic;
+  }
+
+  /* Hover effect on wrapper */
+  .agent-card-wrapper:hover .agent-card-front {
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--qoder-brand-green);
+  }
+
+  /* Mobile: Disable flip on small screens, show click interaction instead */
+  @media (max-width: 768px) {
+    .agent-card-wrapper {
+      perspective: none;
+    }
+    
+    .agent-card {
+      transform: none;
+    }
+    
+    .agent-card-back {
+      display: none;
+    }
+    
+    .flip-hint {
+      display: none;
+    }
+  }
+</style>
+

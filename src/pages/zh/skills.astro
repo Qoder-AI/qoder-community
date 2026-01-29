@@ -1,0 +1,500 @@
+---
+/**
+ * Skills Page (Chinese) - Discover and explore Agent Skills
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import SkillCard from '../../components/SkillCard.astro';
+import SkillSourceCard from '../../components/SkillSourceCard.astro';
+import SkillFilter from '../../components/SkillFilter.astro';
+import RoleSelector from '../../components/RoleSelector.astro';
+import { getCollection } from 'astro:content';
+import { getLangFromPath, useTranslations } from '../../i18n';
+
+// Get current language
+const lang = getLangFromPath(Astro.url.pathname);
+const t = useTranslations(lang);
+const langPrefix = '/zh';
+
+// Get all skills, excluding template file, sorted by date (newest first)
+const allSkills = (await getCollection('skills', ({ id }) => !id.startsWith('_')))
+  .sort((a, b) => {
+    if (a.data.featured && !b.data.featured) return -1;
+    if (!a.data.featured && b.data.featured) return 1;
+    return b.data.date.getTime() - a.data.date.getTime();
+  });
+
+// Get skill sources
+const skillSources = (await getCollection('skillSources', ({ id }) => !id.startsWith('_')))
+  .sort((a, b) => a.data.order - b.data.order);
+
+const skillCount = allSkills.length;
+
+// Count by category
+const categoryCounts: Record<string, number> = { all: skillCount };
+allSkills.forEach(skill => {
+  categoryCounts[skill.data.category] = (categoryCounts[skill.data.category] || 0) + 1;
+});
+
+const categoryCount = Object.keys(categoryCounts).length - 1;
+
+// Count unique roles used
+const rolesSet = new Set<string>();
+allSkills.forEach(skill => {
+  skill.data.roles?.forEach(role => rolesSet.add(role));
+});
+const roleCount = rolesSet.size || 12;
+---
+
+<StarlightPage 
+  frontmatter={{ 
+    title: 'Agent Skills',
+    description: '发现、安装和使用 Agent Skills，帮助 Qoder 完成更专业的任务',
+    template: 'splash',
+    tableOfContents: false,
+  }}
+>
+  <div class="skills-page">
+    <!-- Hero Section -->
+    <div class="hero-section animate-fade-in-up">
+      <div class="hero-badge">
+        <span>Qoder 现已支持 Agent Skills</span>
+      </div>
+      <h1 class="hero-title">增强你的 Qoder</h1>
+      <p class="hero-subtitle">
+        发现、安装和使用 Agent Skills，帮助 Qoder 完成更专业的任务。<br/>
+        从文档处理到代码开发，从营销到数据分析。
+      </p>
+      <div class="hero-cta">
+        <a href="#featured-skills" class="btn primary">浏览全部 Skills</a>
+        <!-- Hidden: 内容尚未准备好
+        <a href="#how-to-use" class="btn secondary">
+          什么是 Skills？
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+        -->
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row animate-fade-in-up">
+      <div class="stat-item">
+        <span class="stat-number">{skillCount}+</span>
+        <span class="stat-label">精选 Skills</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{categoryCount}</span>
+        <span class="stat-label">分类</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">{roleCount}</span>
+        <span class="stat-label">职业角色</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">58k+</span>
+        <span class="stat-label">生态总量</span>
+      </div>
+    </div>
+
+    <!-- How to Use Section -->
+    <section id="how-to-use" class="howto-section animate-fade-in-up">
+      <div class="section-header">
+        <h2 class="section-title">如何在 Qoder 中使用 Skills</h2>
+        <p class="section-subtitle">三个简单步骤，为你的 Qoder 赋予新能力</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3 class="step-title">发现</h3>
+          <p class="step-description">浏览并选择你需要的 Skill，了解它能为你做什么</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3 class="step-title">安装</h3>
+          <p class="step-description">
+            复制 Skill 文件夹到以下任一目录：<br/>
+            <code>~/.qoder/skills/</code> <span class="path-hint">（用户级，所有项目可用）</span><br/>
+            <code>.qoder/skills/</code> <span class="path-hint">（项目级，仅当前项目）</span>
+          </p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3 class="step-title">使用</h3>
+          <p class="step-description">Qoder 会自动检测并加载 Skills，在需要时调用它们</p>
+        </div>
+      </div>
+      <div class="howto-cta">
+        <a href="https://pcnp6jr1np1x.feishu.cn/wiki/WvJGwyRjbiMEXjk4bHucagahnyc" target="_blank" rel="noopener" class="btn secondary">
+          查看安装指南
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- Role-based Recommendations -->
+    <section id="role-recommendations" class="role-section animate-fade-in-up">
+      <div class="section-header">
+        <h2 class="section-title">根据角色推荐</h2>
+        <p class="section-subtitle">选择你的职业角色，发现最适合的 Skills</p>
+      </div>
+      <RoleSelector skills={allSkills} lang={lang} />
+    </section>
+
+    <!-- Category Filter -->
+    <section id="featured-skills" class="skills-section">
+      <div class="section-header animate-fade-in-up">
+        <h2 class="section-title">精选 Skills</h2>
+        <p class="section-subtitle">高质量验证的 Skills，提升你的工作效率</p>
+      </div>
+
+      <SkillFilter activeCategory="all" counts={categoryCounts} lang={lang} />
+
+      <!-- Skills Grid -->
+      <div class="skills-grid stagger-children">
+        {allSkills.map((skill) => (
+          <div data-skill-category={skill.data.category}>
+            <SkillCard entry={skill} lang={lang} />
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- External Sources Section -->
+    <section id="explore-ecosystem" class="sources-section animate-fade-in-up">
+      <div class="section-header">
+        <h2 class="section-title">探索 Skills 生态</h2>
+        <p class="section-subtitle">访问主要 Skills 来源，发现更多可能</p>
+      </div>
+      <div class="sources-grid stagger-children">
+        {skillSources.map((source) => (
+          <SkillSourceCard entry={source} lang={lang} />
+        ))}
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <div id="create-skill" class="cta-section animate-fade-in-up">
+      <h3>创建你自己的 Skill</h3>
+      <p>将你的专业知识打包成可重用的 AI 能力，与社区分享</p>
+      <div class="cta-buttons">
+        <!-- Hidden: 内容尚未准备好
+        <a href="https://agentskills.io" target="_blank" rel="noopener" class="btn primary">
+          学习创建 Skill
+        </a>
+        -->
+        <a href="https://github.com/Qoder-AI/qoder-community" target="_blank" rel="noopener" class="btn secondary">
+          贡献到社区
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</StarlightPage>
+
+<style>
+  .skills-page {
+    max-width: min(1600px, 92vw);
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-8) var(--space-16);
+  }
+
+  /* Hide empty Starlight footer on splash pages */
+  :global(footer.astro-3yyafb3n) {
+    display: none;
+  }
+
+  .hero-section {
+    text-align: center;
+    padding: var(--space-12) 0;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: rgba(42, 219, 92, 0.1);
+    border: 1px solid rgba(42, 219, 92, 0.3);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--qoder-brand-green-dark);
+    margin-bottom: var(--space-6);
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 900;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin: 0 auto var(--space-8);
+    line-height: 1.7;
+  }
+
+  .hero-cta {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-8);
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2);
+    letter-spacing: -0.02em;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+    color: var(--text-tertiary);
+    margin: 0;
+  }
+
+  .sources-section { margin-bottom: var(--space-16); }
+
+  .sources-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+  }
+
+  .skills-section { margin-bottom: var(--space-16); }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+
+  .skills-grid > div { display: contents; }
+
+  .role-section { margin-bottom: var(--space-16); }
+
+  .howto-section { margin-bottom: var(--space-16); }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+
+  .step-card {
+    text-align: center;
+    padding: var(--space-6);
+    margin: 0 !important;
+    background: var(--surface-elevated);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-lg);
+    transition: all var(--duration-normal) var(--ease-out);
+  }
+
+  .step-card:hover {
+    border-color: var(--qoder-brand-green);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+  }
+
+  .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: var(--qoder-brand-green);
+    color: var(--text-on-brand);
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 800;
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-4);
+  }
+
+  .step-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2);
+  }
+
+  .step-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .step-description code {
+    background: rgba(42, 219, 92, 0.1);
+    color: var(--qoder-brand-green-dark);
+    padding: 0.15em 0.4em;
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+  }
+
+  .path-hint {
+    font-size: 0.8em;
+    color: var(--text-muted, #888);
+    margin-left: 0.3em;
+  }
+
+  .howto-cta { text-align: center; }
+
+  @media (max-width: 1200px) {
+    .sources-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 1024px) {
+    .skills-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .skills-page { padding: var(--space-4) var(--space-4) var(--space-12); }
+    .hero-section { padding: var(--space-8) 0; }
+    .sources-grid { grid-template-columns: 1fr; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .hero-cta { flex-direction: column; align-items: center; }
+    .hero-cta .btn { width: 100%; max-width: 300px; }
+
+  }
+</style>
+
+<script>
+  // Inject page navigation into Starlight header
+  const injectHeaderNav = () => {
+    const header = document.querySelector('main h1');
+    if (!header) return;
+    
+    // Check if nav already exists
+    if (document.querySelector('.header-page-nav')) return;
+    
+    // Create navigation container
+    const nav = document.createElement('nav');
+    nav.className = 'header-page-nav';
+    nav.innerHTML = `
+      <a href="#how-to-use" class="header-nav-link">如何使用</a>
+      <a href="#role-recommendations" class="header-nav-link">角色推荐</a>
+      <a href="#featured-skills" class="header-nav-link">精选 Skills</a>
+      <a href="#explore-ecosystem" class="header-nav-link">探索生态</a>
+      <a href="#create-skill" class="header-nav-link">创建 Skill</a>
+    `;
+    
+    // Create wrapper for h1 and nav
+    const wrapper = document.createElement('div');
+    wrapper.className = 'header-title-wrapper';
+    header.parentNode?.insertBefore(wrapper, header);
+    wrapper.appendChild(header);
+    wrapper.appendChild(nav);
+    
+    // Add styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .header-title-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+        flex-wrap: wrap;
+      }
+      .header-title-wrapper h1 {
+        margin: 0 !important;
+      }
+      .header-page-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .header-nav-link {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--sl-color-gray-3);
+        text-decoration: none;
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .header-nav-link:hover,
+      .header-nav-link.active {
+        color: var(--qoder-brand-green-dark, #1a9f4a);
+        background: rgba(42, 219, 92, 0.1);
+      }
+      @media (max-width: 768px) {
+        .header-title-wrapper {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+        .header-page-nav {
+          overflow-x: auto;
+          width: 100%;
+          padding-bottom: 0.5rem;
+          scrollbar-width: none;
+        }
+        .header-page-nav::-webkit-scrollbar {
+          display: none;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Smooth scroll for navigation links
+    nav.querySelectorAll('.header-nav-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href')?.slice(1);
+        if (targetId) {
+          const target = document.getElementById(targetId);
+          if (target) {
+            const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sl-nav-height') || '64');
+            const offset = headerHeight + 20;
+            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset;
+            window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+          }
+        }
+      });
+    });
+  };
+  
+  // Scroll-based navigation highlighting
+  const setupScrollHighlight = () => {
+    const sections = ['how-to-use', 'role-recommendations', 'featured-skills', 'explore-ecosystem', 'create-skill'];
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          document.querySelectorAll('.header-nav-link').forEach(link => link.classList.remove('active'));
+          document.querySelector(`.header-nav-link[href="#${entry.target.id}"]`)?.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+  };
+  
+  // Run on page load
+  injectHeaderNav();
+  setupScrollHighlight();
+</script>

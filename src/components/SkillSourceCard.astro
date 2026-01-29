@@ -1,0 +1,111 @@
+---
+/**
+ * SkillSourceCard Component - External resource entry card
+ * Links to external skill marketplaces and repositories
+ */
+import type { CollectionEntry } from 'astro:content';
+import { ui, defaultLang, getSkillSourceDescription } from '../i18n';
+
+interface Props {
+  entry: CollectionEntry<'skillSources'>;
+  lang?: keyof typeof ui;
+}
+
+const { entry, lang = defaultLang } = Astro.props;
+const { data, slug } = entry;
+
+// Get translated description
+const displayDescription = getSkillSourceDescription(slug, data.description, lang);
+---
+
+<a href={data.url} target="_blank" rel="noopener noreferrer" class="source-card hover-lift">
+  <div class="source-content">
+    <h3 class="source-name">{data.name}</h3>
+    <p class="source-description">{displayDescription}</p>
+    {data.skillCount && (
+      <span class="source-count">{data.skillCount} skills</span>
+    )}
+  </div>
+  <div class="source-arrow">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 17L17 7"/>
+      <path d="M7 7h10v10"/>
+    </svg>
+  </div>
+</a>
+
+<style>
+  .source-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    background: var(--surface-elevated);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    text-decoration: none;
+    transition: all var(--duration-normal) var(--ease-out-expo);
+    position: relative;
+  }
+
+  .source-card:hover {
+    border-color: var(--qoder-brand-green);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+  }
+
+  .source-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .source-name {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-1);
+  }
+
+  .source-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-2);
+    line-height: 1.5;
+  }
+
+  .source-count {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--qoder-brand-green-dark);
+    background: rgba(42, 219, 92, 0.1);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-full);
+  }
+
+  .source-arrow {
+    color: var(--text-tertiary);
+    transition: all var(--duration-normal) var(--ease-out);
+    flex-shrink: 0;
+  }
+
+  .source-card:hover .source-arrow {
+    color: var(--qoder-brand-green);
+    transform: translate(4px, -4px);
+  }
+
+  @media (max-width: 768px) {
+    .source-card {
+      flex-direction: column;
+      text-align: center;
+      padding: var(--space-6);
+    }
+
+    .source-arrow {
+      position: absolute;
+      top: var(--space-3);
+      right: var(--space-3);
+    }
+  }
+</style>

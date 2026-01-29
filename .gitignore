@@ -1,0 +1,38 @@
+# 构建输出
+dist/
+.astro/
+
+# 依赖
+node_modules/
+
+# 日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 环境变量
+.env
+.env.production
+.env.local
+.env.*.local
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Cursor IDE
+.cursor/
+.cursorrules
+
+# 临时文件
+*.log
+.cache/

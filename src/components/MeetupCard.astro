@@ -1,0 +1,428 @@
+---
+/**
+ * MeetupCard - Meetup event card component
+ * Different layouts for upcoming vs past events
+ */
+import type { CollectionEntry } from 'astro:content';
+
+export interface Props {
+  entry: CollectionEntry<'meetups'>;
+}
+
+const { entry } = Astro.props;
+const { title, description, location, date, status, registrationUrl, capacity, attendees, image, recordingUrl, organizer, topics } = entry.data;
+
+const isUpcoming = status === 'upcoming';
+
+// Calculate days until event for upcoming meetups
+const daysUntil = isUpcoming ? Math.ceil((date.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 0;
+const showCountdown = isUpcoming && daysUntil > 0 && daysUntil <= 30;
+
+// Format date
+const formattedDate = date.toLocaleDateString('en-US', { 
+  month: 'short', 
+  day: 'numeric', 
+  year: 'numeric' 
+});
+---
+
+{isUpcoming ? (
+  <!-- Upcoming Event Card - Large, Featured Layout -->
+  <article class="meetup-card meetup-upcoming">
+    <div class="meetup-image-wrapper">
+      <img src={image} alt={title} loading="lazy" />
+      <div class="image-overlay"></div>
+    </div>
+    
+    <div class="meetup-content">
+      {showCountdown && (
+        <div class="countdown-badge">
+          {daysUntil === 1 ? 'Tomorrow' : `In ${daysUntil} days`}
+        </div>
+      )}
+      
+      <div class="meetup-date">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <span>{formattedDate}</span>
+      </div>
+      
+      <h3 class="meetup-title">{title}</h3>
+      <p class="meetup-description">{description}</p>
+      
+      <div class="meetup-details">
+        <div class="detail-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span>{location}</span>
+        </div>
+        
+        {capacity && (
+          <div class="detail-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>{attendees || 0}/{capacity} registered</span>
+          </div>
+        )}
+        
+        <div class="detail-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>{organizer}</span>
+        </div>
+      </div>
+      
+      <div class="meetup-topics">
+        {topics.map(topic => <span class="topic-tag">{topic}</span>)}
+      </div>
+      
+      {registrationUrl && (
+        <a href={registrationUrl} target="_blank" rel="noopener noreferrer" class="register-btn">
+          Register Now
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      )}
+    </div>
+  </article>
+) : (
+  <!-- Past Event Card - Compact Gallery Layout -->
+  <article class="meetup-card meetup-past">
+    <div class="past-image">
+      <img src={image} alt={title} loading="lazy" />
+    </div>
+    
+    <div class="past-content">
+      <div class="past-header">
+        <span class="past-date">{formattedDate}</span>
+        <span class="past-location">{location}</span>
+      </div>
+      
+      <h3 class="past-title">{title}</h3>
+      
+      <div class="past-stats">
+        <span class="stat-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          {attendees} attended
+        </span>
+        
+        {recordingUrl && (
+          <a href={recordingUrl} target="_blank" rel="noopener noreferrer" class="recording-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Recording
+          </a>
+        )}
+      </div>
+    </div>
+  </article>
+)}
+
+<style>
+  /* Common Styles - Light Theme */
+  .meetup-card {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all var(--duration-normal) var(--ease-out);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .meetup-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--qoder-brand-green);
+  }
+
+  /* Upcoming Event Styles */
+  .meetup-upcoming {
+    position: relative;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .meetup-image-wrapper {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .meetup-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0.95) 100%
+    );
+  }
+
+  .meetup-content {
+    position: relative;
+    z-index: 1;
+    padding: var(--space-8);
+    margin-top: auto;
+  }
+
+  .countdown-badge {
+    display: inline-block;
+    background: var(--gradient-brand);
+    color: var(--text-on-brand);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: var(--shadow-glow-sm);
+  }
+
+  .meetup-date {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--qoder-brand-green-dark);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--space-3);
+  }
+
+  .meetup-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-3);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .meetup-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 var(--space-5);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .meetup-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .detail-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-tertiary);
+    font-size: 0.9rem;
+  }
+
+  .detail-item svg {
+    flex-shrink: 0;
+  }
+
+  .meetup-topics {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+  }
+
+  .meetup-topics > * {
+    margin: 0 !important;
+  }
+
+  .topic-tag {
+    padding: var(--space-1) var(--space-3);
+    background: var(--overlay-brand);
+    color: var(--qoder-brand-green-dark);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(42, 219, 92, 0.3);
+  }
+
+  .register-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-6);
+    background: var(--gradient-brand);
+    color: var(--text-on-brand);
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all var(--duration-normal) var(--ease-out-expo);
+    box-shadow: var(--shadow-md), 0 4px 20px rgba(42, 219, 92, 0.2);
+  }
+
+  .register-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), 0 8px 30px rgba(42, 219, 92, 0.3);
+    background: var(--gradient-brand-hover);
+  }
+
+  .register-btn svg {
+    transition: transform var(--duration-normal) var(--ease-out);
+  }
+
+  .register-btn:hover svg {
+    transform: translateX(4px);
+  }
+
+  /* Past Event Styles */
+  .meetup-past {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+  }
+
+  .past-image {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: var(--background-primary);
+  }
+
+  .past-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--duration-normal) var(--ease-out);
+  }
+
+  .meetup-past:hover .past-image img {
+    transform: scale(1.05);
+  }
+
+  .past-content {
+    padding: var(--space-5);
+    flex: 1;
+  }
+
+  .past-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+  }
+
+  .past-date {
+    font-weight: 600;
+  }
+
+  .past-location {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .past-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
+    line-height: 1.3;
+  }
+
+  .past-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .meetup-card .stat-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-tertiary);
+    font-size: 0.85rem;
+  }
+
+  .recording-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--qoder-brand-green);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .recording-link:hover {
+    transform: translateX(4px);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .meetup-upcoming {
+      min-height: 400px;
+    }
+
+    .meetup-content {
+      padding: var(--space-6);
+    }
+
+    .meetup-title {
+      font-size: 1.4rem;
+    }
+
+    .meetup-description {
+      font-size: 0.9rem;
+    }
+
+    .register-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .past-image {
+      height: 160px;
+    }
+  }
+</style>
+

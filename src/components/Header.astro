@@ -1,0 +1,381 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import Search from '@astrojs/starlight/components/Search.astro';
+import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { getLangFromPath, useTranslations } from '../i18n';
+
+// Get current language
+const currentPath = Astro.url.pathname;
+const lang = getLangFromPath(currentPath);
+const t = useTranslations(lang);
+
+// Language prefix for links
+const langPrefix = lang === 'zh-CN' ? '/zh' : '';
+
+const navLinks = [
+  { href: `${langPrefix}/skills/`, label: t('nav.skills') },
+  { href: `${langPrefix}/agents/`, label: t('nav.agents') },
+  { href: `${langPrefix}/learn/`, label: t('nav.learn') },
+  { href: `${langPrefix}/showcase/`, label: t('nav.showcase') },
+  { href: `${langPrefix}/meetups/`, label: t('nav.meetups') },
+];
+---
+
+<div class="header sl-flex">
+  <div class="header-left sl-flex">
+    <a href="/" class="site-title sl-flex">
+      <span class="site-title-text">Qoder Community</span>
+    </a>
+    <nav class="header-nav" aria-label="Main navigation">
+      {navLinks.map((link) => (
+        <a href={link.href} class="nav-link">{link.label}</a>
+      ))}
+    </nav>
+  </div>
+  <div class="header-right sl-flex">
+    <Search {...Astro.props} />
+    <LanguageSwitcher />
+    <SocialIcons {...Astro.props} />
+    
+    <!-- Mobile Menu Button -->
+    <button 
+      class="mobile-menu-btn" 
+      aria-label="Toggle navigation menu"
+      aria-expanded="false"
+      aria-controls="mobile-nav"
+    >
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+  </div>
+</div>
+
+<!-- Mobile Navigation Drawer -->
+<div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+<nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+  <div class="mobile-nav-header">
+    <span class="mobile-nav-title">{t('nav.navigation')}</span>
+    <button class="mobile-nav-close" aria-label="Close menu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  <div class="mobile-nav-links">
+    {navLinks.map((link) => (
+      <a href={link.href} class="mobile-nav-link">{link.label}</a>
+    ))}
+  </div>
+  <div class="mobile-nav-footer">
+    <LanguageSwitcher class="mobile-lang-switcher" />
+    <a href={`${langPrefix}/`} class="mobile-nav-home">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+      {t('nav.home')}
+    </a>
+  </div>
+</nav>
+
+<script>
+  // Mobile menu toggle functionality
+  function initMobileMenu() {
+    const menuBtn = document.querySelector('.mobile-menu-btn');
+    const closeBtn = document.querySelector('.mobile-nav-close');
+    const overlay = document.getElementById('mobile-nav-overlay');
+    const mobileNav = document.getElementById('mobile-nav');
+    const navLinks = document.querySelectorAll('.mobile-nav-link');
+    
+    function openMenu() {
+      mobileNav?.classList.add('open');
+      overlay?.classList.add('open');
+      menuBtn?.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeMenu() {
+      mobileNav?.classList.remove('open');
+      overlay?.classList.remove('open');
+      menuBtn?.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+    
+    menuBtn?.addEventListener('click', openMenu);
+    closeBtn?.addEventListener('click', closeMenu);
+    overlay?.addEventListener('click', closeMenu);
+    
+    // Close menu when clicking a nav link
+    navLinks.forEach(link => {
+      link.addEventListener('click', closeMenu);
+    });
+    
+    // Close menu on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileNav?.classList.contains('open')) {
+        closeMenu();
+      }
+    });
+  }
+  
+  // Initialize on page load and after Astro navigation
+  initMobileMenu();
+  document.addEventListener('astro:after-swap', initMobileMenu);
+</script>
+
+<style>
+  .header {
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    padding: 0 var(--space-4);
+    gap: var(--space-4);
+  }
+
+  .header-left {
+    align-items: center;
+    gap: var(--space-8);
+  }
+
+  .site-title {
+    align-items: center;
+    gap: var(--space-2);
+    text-decoration: none;
+    color: var(--qoder-brand-green);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    white-space: nowrap;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .site-title:hover {
+    color: var(--qoder-brand-green-light);
+  }
+
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .nav-link {
+    padding: var(--space-2) var(--space-4);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: all var(--duration-fast) var(--ease-out);
+    white-space: nowrap;
+  }
+
+  .nav-link:hover {
+    color: var(--qoder-brand-green);
+    background: var(--hover-bg);
+  }
+
+  .header-right {
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  /* Mobile Menu Button */
+  .mobile-menu-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    padding: var(--space-2);
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    gap: 5px;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .mobile-menu-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--qoder-brand-green);
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--text-secondary);
+    border-radius: var(--radius-full);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .mobile-menu-btn:hover .hamburger-line {
+    background: var(--qoder-brand-green);
+  }
+
+  /* Mobile Navigation Overlay */
+  .mobile-nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 998;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-normal) var(--ease-out);
+  }
+
+  .mobile-nav-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Mobile Navigation Drawer */
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(320px, 85vw);
+    background: var(--surface-elevated);
+    box-shadow: var(--shadow-2xl);
+    z-index: 999;
+    transform: translateX(100%);
+    transition: transform var(--duration-normal) var(--ease-out-expo);
+    flex-direction: column;
+  }
+
+  .mobile-nav.open {
+    transform: translateX(0);
+  }
+
+  .mobile-nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .mobile-nav-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+  }
+
+  .mobile-nav-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--text-tertiary);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .mobile-nav-close:hover {
+    background: var(--background-tertiary);
+    color: var(--text-primary);
+  }
+
+  .mobile-nav-links {
+    flex: 1;
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    overflow-y: auto;
+  }
+
+  .mobile-nav-link {
+    display: flex;
+    align-items: center;
+    padding: var(--space-4) var(--space-4);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .mobile-nav-link:hover {
+    background: var(--hover-bg);
+    color: var(--qoder-brand-green);
+    padding-left: var(--space-5);
+  }
+
+  .mobile-nav-footer {
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .mobile-nav-footer :global(.mobile-lang-switcher) {
+    width: 100%;
+  }
+
+  .mobile-nav-footer :global(.mobile-lang-switcher .lang-btn) {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mobile-nav-footer :global(.mobile-lang-switcher .lang-dropdown) {
+    left: 0;
+    right: 0;
+  }
+
+  .mobile-nav-home {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--qoder-brand-green);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--qoder-brand-green);
+    justify-content: center;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .mobile-nav-home:hover {
+    background: var(--qoder-brand-green);
+    color: var(--text-on-brand);
+  }
+
+  /* Responsive - show mobile menu on smaller screens */
+  @media (max-width: 72rem) {
+    .header-nav {
+      display: none;
+    }
+
+    .mobile-menu-btn {
+      display: flex;
+    }
+
+    .mobile-nav-overlay {
+      display: block;
+    }
+
+    .mobile-nav {
+      display: flex;
+    }
+  }
+</style>
+

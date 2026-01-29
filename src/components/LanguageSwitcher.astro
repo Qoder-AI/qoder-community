@@ -1,0 +1,227 @@
+---
+/**
+ * Language Switcher Component
+ * Dropdown to switch between English and Chinese
+ */
+import { languages, getLangFromPath, getLocalizedPath } from '../i18n';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const currentPath = Astro.url.pathname;
+const currentLang = getLangFromPath(currentPath);
+const currentLangLabel = currentLang === 'zh-CN' ? '中文' : 'English';
+---
+
+<div class:list={['language-switcher', className]}>
+  <button 
+    class="lang-btn" 
+    aria-label="Select language"
+    aria-expanded="false"
+    aria-haspopup="listbox"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lang-icon">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+      <path d="M2 12h20"/>
+    </svg>
+    <span class="lang-label">{currentLangLabel}</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron">
+      <path d="m6 9 6 6 6-6"/>
+    </svg>
+  </button>
+  
+  <ul class="lang-dropdown" role="listbox">
+    <li>
+      <a 
+        href={getLocalizedPath(currentPath, 'en')} 
+        class:list={['lang-option', { active: currentLang === 'en' }]}
+        role="option"
+        aria-selected={currentLang === 'en'}
+      >
+        <span class="lang-name">English</span>
+        {currentLang === 'en' && (
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        )}
+      </a>
+    </li>
+    <li>
+      <a 
+        href={getLocalizedPath(currentPath, 'zh-CN')} 
+        class:list={['lang-option', { active: currentLang === 'zh-CN' }]}
+        role="option"
+        aria-selected={currentLang === 'zh-CN'}
+      >
+        <span class="lang-name">中文</span>
+        {currentLang === 'zh-CN' && (
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        )}
+      </a>
+    </li>
+  </ul>
+</div>
+
+<script>
+  function initLanguageSwitcher() {
+    const switchers = document.querySelectorAll('.language-switcher');
+    
+    switchers.forEach(switcher => {
+      const btn = switcher.querySelector('.lang-btn');
+      const dropdown = switcher.querySelector('.lang-dropdown');
+      
+      btn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = switcher.classList.contains('open');
+        
+        // Close all other switchers
+        document.querySelectorAll('.language-switcher.open').forEach(s => {
+          s.classList.remove('open');
+          s.querySelector('.lang-btn')?.setAttribute('aria-expanded', 'false');
+        });
+        
+        if (!isOpen) {
+          switcher.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      });
+    });
+    
+    // Close on click outside
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.language-switcher.open').forEach(s => {
+        s.classList.remove('open');
+        s.querySelector('.lang-btn')?.setAttribute('aria-expanded', 'false');
+      });
+    });
+    
+    // Close on escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.language-switcher.open').forEach(s => {
+          s.classList.remove('open');
+          s.querySelector('.lang-btn')?.setAttribute('aria-expanded', 'false');
+        });
+      }
+    });
+  }
+  
+  initLanguageSwitcher();
+  document.addEventListener('astro:after-swap', initLanguageSwitcher);
+</script>
+
+<style>
+  .language-switcher {
+    position: relative;
+  }
+  
+  .lang-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  
+  .lang-btn:hover {
+    background: var(--hover-bg);
+    border-color: var(--qoder-brand-green);
+    color: var(--text-primary);
+  }
+  
+  .language-switcher.open .lang-btn {
+    background: var(--hover-bg);
+    border-color: var(--qoder-brand-green);
+  }
+  
+  .lang-icon {
+    flex-shrink: 0;
+  }
+  
+  .lang-label {
+    white-space: nowrap;
+  }
+  
+  .chevron {
+    flex-shrink: 0;
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+  
+  .language-switcher.open .chevron {
+    transform: rotate(180deg);
+  }
+  
+  .lang-dropdown {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    right: 0;
+    min-width: 140px;
+    padding: var(--space-2);
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    list-style: none;
+    margin: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all var(--duration-fast) var(--ease-out);
+    z-index: 100;
+  }
+  
+  .language-switcher.open .lang-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  
+  .lang-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  
+  .lang-option:hover {
+    background: var(--hover-bg);
+    color: var(--text-primary);
+  }
+  
+  .lang-option.active {
+    color: var(--qoder-brand-green);
+  }
+  
+  .lang-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  /* Hide label on mobile */
+  @media (max-width: 640px) {
+    .lang-label {
+      display: none;
+    }
+    
+    .lang-btn {
+      padding: var(--space-2);
+    }
+  }
+</style>

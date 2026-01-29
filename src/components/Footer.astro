@@ -1,0 +1,75 @@
+---
+/**
+ * Custom Footer component with "Built with Qoder + Skills" message
+ */
+import type { Props } from '@astrojs/starlight/props';
+import { getLangFromPath, useTranslations } from '../i18n';
+
+// Get current language
+const currentPath = Astro.url.pathname;
+const lang = getLangFromPath(currentPath);
+const t = useTranslations(lang);
+---
+
+<footer class="qoder-footer">
+  <div class="footer-content">
+    <div class="built-with">
+      <svg class="sparkle-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+      </svg>
+      <span>{t('footer.builtWith')}</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .qoder-footer {
+    width: 100%;
+    padding: var(--space-6) var(--space-4);
+    background: var(--surface-sunken);
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .footer-content {
+    max-width: 1600px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .built-with {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--gradient-subtle);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .built-with:hover {
+    border-color: var(--qoder-brand-green);
+    color: var(--text-primary);
+  }
+
+  .sparkle-icon {
+    color: var(--qoder-brand-green);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .qoder-footer {
+      padding: var(--space-4) var(--space-3);
+    }
+
+    .built-with {
+      font-size: 0.8rem;
+      padding: var(--space-2) var(--space-3);
+      text-align: center;
+    }
+  }
+</style>

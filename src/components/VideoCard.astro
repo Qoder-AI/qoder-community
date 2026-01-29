@@ -1,0 +1,197 @@
+---
+/**
+ * VideoCard - YouTube video embed component
+ * Shows responsive 16:9 video player with metadata
+ */
+import type { CollectionEntry } from 'astro:content';
+
+export interface Props {
+  entry: CollectionEntry<'videos'>;
+}
+
+const { entry } = Astro.props;
+const { title, description, youtubeId, channel, channelUrl, duration, category } = entry.data;
+
+// Category colors
+const categoryColors = {
+  'Tutorial': '#2ADB5C',
+  'Review': '#3B82F6',
+  'Introduction': '#8B5CF6',
+  'Case Study': '#F59E0B',
+};
+
+const categoryColor = categoryColors[category as keyof typeof categoryColors];
+---
+
+<article class="video-card">
+  <div class="video-wrapper">
+    <iframe
+      src={`https://www.youtube.com/embed/${youtubeId}`}
+      title={title}
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+      loading="lazy"
+    ></iframe>
+    <div class="duration-badge">{duration}</div>
+  </div>
+  
+  <div class="video-metadata">
+    <h3 class="video-title">{title}</h3>
+    <p class="video-description">{description}</p>
+    
+    <div class="video-footer">
+      <a href={channelUrl} target="_blank" rel="noopener noreferrer" class="channel-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+        </svg>
+        <span>{channel}</span>
+      </a>
+      
+      <span class="category-badge" style={`background-color: ${categoryColor}20; border-color: ${categoryColor}40; color: ${categoryColor};`}>
+        {category}
+      </span>
+    </div>
+  </div>
+</article>
+
+<style>
+  .video-card {
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all var(--duration-normal) var(--ease-out);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .video-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+    border-color: var(--qoder-brand-green);
+  }
+
+  .video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .duration-badge {
+    position: absolute;
+    bottom: var(--space-3);
+    right: var(--space-3);
+    background: rgba(0, 0, 0, 0.85);
+    color: var(--text-inverse);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-xs);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    pointer-events: none;
+  }
+
+  .video-metadata {
+    padding: var(--space-5);
+  }
+
+  .video-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-2);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .video-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 var(--space-4);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .video-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .channel-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-tertiary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color var(--duration-fast) var(--ease-out);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .channel-link:hover {
+    color: var(--qoder-brand-green);
+  }
+
+  .channel-link svg {
+    flex-shrink: 0;
+  }
+
+  .channel-link span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .category-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    border: 1px solid;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .video-metadata {
+      padding: var(--space-4);
+    }
+
+    .video-title {
+      font-size: 1rem;
+    }
+
+    .video-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+  }
+</style>
+

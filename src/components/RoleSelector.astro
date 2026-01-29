@@ -1,0 +1,401 @@
+---
+/**
+ * RoleSelector Component - Job role selector for skill recommendations
+ * Displays role pills and shows top skills for selected role
+ */
+import type { CollectionEntry } from 'astro:content';
+import { ui, defaultLang, getRoleLabel, getSkillDisplayName, getSkillTitle } from '../i18n';
+
+interface Props {
+  skills: CollectionEntry<'skills'>[];
+  lang?: keyof typeof ui;
+}
+
+const { skills, lang = defaultLang } = Astro.props;
+
+// Language prefix for links
+const langPrefix = lang === 'zh-CN' ? '/zh' : '';
+
+const roles = [
+  { id: 'developer', label: 'Developer', zhLabel: '开发者' },
+  { id: 'marketer', label: 'Marketer', zhLabel: '营销人员' },
+  { id: 'designer', label: 'Designer', zhLabel: '设计师' },
+  { id: 'pm', label: 'Product Manager', zhLabel: '产品经理' },
+  { id: 'data-analyst', label: 'Data Analyst', zhLabel: '数据分析师' },
+  { id: 'devops', label: 'DevOps/IT', zhLabel: 'DevOps/IT' },
+  { id: 'content', label: 'Content Creator', zhLabel: '内容创作者' },
+  { id: 'sales', label: 'Sales', zhLabel: '销售' },
+  { id: 'finance', label: 'Finance', zhLabel: '财务' },
+  { id: 'hr', label: 'HR', zhLabel: '人力资源' },
+  { id: 'legal', label: 'Legal', zhLabel: '法务' },
+  { id: 'executive', label: 'Executive', zhLabel: '高管' },
+];
+
+// Get display label based on language
+const getDisplayLabel = (role: typeof roles[0]) => {
+  return lang === 'zh-CN' ? role.zhLabel : role.label;
+};
+
+// Translation strings
+const t = {
+  recommendedSkillsFor: lang === 'zh-CN' ? '为{role}推荐的 Skills' : 'Recommended Skills for {role}',
+  noSkills: lang === 'zh-CN' ? '暂无该角色的推荐 Skills' : 'No recommended skills for this role yet',
+  viewAll: lang === 'zh-CN' ? '查看全部推荐' : 'View all recommendations',
+};
+
+// Pre-compute skills for each role
+const skillsByRole: Record<string, CollectionEntry<'skills'>[]> = {};
+roles.forEach(role => {
+  skillsByRole[role.id] = skills
+    .filter(s => s.data.roles?.includes(role.id as any))
+    .slice(0, 10);
+});
+---
+
+<div class="role-selector" data-role-selector>
+  <div class="role-pills">
+    {roles.map((role, index) => (
+      <button 
+        class={`role-pill ${index === 0 ? 'active' : ''}`}
+        data-role={role.id}
+        type="button"
+      >
+        <span class="role-label">{getDisplayLabel(role)}</span>
+      </button>
+    ))}
+  </div>
+
+  <div class="role-content">
+    {roles.map((role, index) => (
+      <div 
+        class={`role-skills ${index === 0 ? 'active' : ''}`}
+        data-role-content={role.id}
+      >
+        <div class="role-header">
+          <h4 class="role-header-title">{t.recommendedSkillsFor.replace('{role}', getDisplayLabel(role))}</h4>
+        </div>
+        
+        {skillsByRole[role.id].length > 0 ? (
+          <div class="role-skills-list">
+            {skillsByRole[role.id].map((skill, skillIndex) => (
+              <a href={`${langPrefix}/skills/${skill.slug}/`} class="role-skill-item">
+                <span class="skill-rank">#{skillIndex + 1}</span>
+                <span class="skill-info">
+                  <span class="skill-name">{getSkillDisplayName(skill.slug, skill.data.name, lang)}</span>
+                  <span class="skill-desc">{getSkillTitle(skill.slug, skill.data.title, lang)}</span>
+                </span>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <p class="no-skills">{t.noSkills}</p>
+        )}
+
+        {skillsByRole[role.id].length > 0 && (
+          <a href={`${langPrefix}/skills/?role=${role.id}`} class="view-all-link">
+            {t.viewAll}
+          </a>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  function initRoleSelector() {
+    const selector = document.querySelector('[data-role-selector]');
+    if (!selector) return;
+
+    const pills = selector.querySelectorAll('.role-pill');
+    const contents = selector.querySelectorAll('[data-role-content]');
+
+    // Apply initial inline styles to ensure correct border color
+    pills.forEach(p => {
+      const btn = p as HTMLElement;
+      if (btn.classList.contains('active')) {
+        btn.style.borderColor = '#2ADB5C';
+        btn.style.backgroundColor = '#2ADB5C';
+        btn.style.color = '#ffffff';
+      } else {
+        btn.style.borderColor = '#3F5B54';
+        btn.style.backgroundColor = '';
+        btn.style.color = '#3F5B54';
+      }
+    });
+
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        const role = pill.getAttribute('data-role');
+        
+        // Update active pill with inline styles
+        pills.forEach(p => {
+          const btn = p as HTMLElement;
+          btn.classList.remove('active');
+          btn.style.borderColor = '#3F5B54';
+          btn.style.backgroundColor = '';
+          btn.style.color = '#3F5B54';
+        });
+        (pill as HTMLElement).classList.add('active');
+        (pill as HTMLElement).style.borderColor = '#2ADB5C';
+        (pill as HTMLElement).style.backgroundColor = '#2ADB5C';
+        (pill as HTMLElement).style.color = '#ffffff';
+
+        // Update visible content
+        contents.forEach(content => {
+          if (content.getAttribute('data-role-content') === role) {
+            content.classList.add('active');
+          } else {
+            content.classList.remove('active');
+          }
+        });
+      });
+    });
+  }
+
+  initRoleSelector();
+  document.addEventListener('astro:after-swap', initRoleSelector);
+</script>
+
+<style>
+  .role-selector {
+    background: var(--surface-elevated);
+    border: 1px solid var(--structural-teal);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    margin-bottom: var(--space-12);
+  }
+
+  .role-pills {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .role-pills button.role-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 12px;
+    margin: 0 !important;
+    background: transparent;
+    border: 1px solid #3F5B54 !important;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #3F5B54;
+    cursor: pointer;
+    transition: all 0.15s ease-out;
+    line-height: 1.2;
+    height: 32px;
+    box-sizing: border-box;
+  }
+
+  .role-pills button.role-pill:hover {
+    border-color: #2ADB5C !important;
+    color: var(--text-primary, #1a1a1c);
+    background: var(--hover-bg, #f5f5f5);
+  }
+
+  .role-pills button.role-pill.active {
+    background: #2ADB5C !important;
+    border-color: #2ADB5C !important;
+    color: #ffffff !important;
+  }
+
+  .role-content {
+    min-height: 300px;
+  }
+
+  .role-skills {
+    display: none;
+    animation: fadeIn var(--duration-normal) var(--ease-out);
+  }
+
+  .role-skills.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .role-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .role-header-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .role-skills-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .role-skill-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--background-primary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .role-skill-item:hover {
+    border-color: var(--qoder-brand-green);
+    background: var(--hover-bg);
+    transform: translateX(4px);
+  }
+
+  .skill-rank {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--qoder-brand-green);
+    min-width: 28px;
+  }
+
+  .skill-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+  }
+
+  .skill-name {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .skill-desc {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .no-skills {
+    color: var(--text-tertiary);
+    font-style: italic;
+    text-align: center;
+    padding: var(--space-8);
+  }
+
+  .view-all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--qoder-brand-green);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .view-all-link:hover {
+    color: var(--qoder-brand-green-dark);
+  }
+
+  @media (max-width: 768px) {
+    .role-selector {
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-8);
+    }
+
+    .role-pills {
+      justify-content: flex-start;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      padding-bottom: var(--space-4);
+      padding-right: var(--space-8);
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      /* 渐变遮罩提示可滚动 */
+      mask-image: linear-gradient(to right, black 90%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
+    }
+
+    .role-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .role-pill {
+      flex-shrink: 0;
+    }
+
+    .role-content {
+      min-height: 200px;
+    }
+
+    .role-header {
+      margin-bottom: var(--space-3);
+    }
+
+    .role-header-title {
+      font-size: 1rem;
+    }
+
+    .role-skills-list {
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
+
+    .role-skill-item {
+      padding: var(--space-3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 清除可能的伪元素干扰 */
+    .role-skill-item::before,
+    .role-skill-item::after {
+      display: none !important;
+      content: none !important;
+    }
+
+    .skill-rank {
+      font-size: 0.8rem;
+      min-width: 24px;
+    }
+
+    .skill-name {
+      font-size: 0.85rem;
+    }
+
+    .skill-desc {
+      font-size: 0.7rem;
+    }
+
+    .view-all-link {
+      font-size: 0.8rem;
+      padding: var(--space-2) 0;
+    }
+  }
+</style>
