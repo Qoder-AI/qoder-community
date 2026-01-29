@@ -4,74 +4,58 @@ Thank you for your interest in contributing to the Qoder Community! This guide w
 
 ## Ways to Contribute
 
-### 1. Share Your Agent Configuration
+We currently welcome contributions for **Agent Skills**. Help the community by sharing your specialized skills to enhance AI agents!
 
-Help others by sharing your `.qoderrules` or agent setup:
+### 1. Share Your Agent Skills
 
-1. Fork this repository
-2. Create a new file in `src/content/agents/your-agent-name.md`
-3. Use the template below
-4. Submit a Pull Request
+1. Fork this repository.
+2. Create a new file in `src/content/skills/your-skill-name.md` (English) and/or `src/content/skills-zh/your-skill-name.md` (Chinese).
+3. Use the template below.
+4. Submit a Pull Request.
 
-**Agent Template:**
+**Skill Template:**
 
 ```markdown
 ---
-title: "Your Agent Name"
-description: "Brief description of what your agent does"
-author:
-  name: "Your Name"
-  avatar: "https://github.com/username.png"
-  url: "https://github.com/username"
-githubUrl: "https://github.com/username/repo"
-tags: ["React", "TypeScript", "Node.js"]
-category: "Full-Stack"
-useCase: "Web applications"
-date: 2025-01-01
+name: skill-name
+title: Skill Title
+description: A brief description of what this skill does
+source: community
+author: Your Name
+githubUrl: https://github.com/username/skill
+docsUrl: https://example.com/docs
+category: development # development | design | marketing | productivity | automation | data | security | document | meta
+tags:
+  - tag1
+  - tag2
+roles:
+  - developer
 featured: false
+popular: false
+isOfficial: false
+installCommand: |
+  git clone https://github.com/username/skill
+  cp -r skill-name ~/.qoder/skills/
+date: 2026-01-01
 ---
 
-# Agent Description
+## Use Cases
 
-Describe your agent configuration here...
+- Use case 1
+- Use case 2
 
-## Key Features
+## Example
 
-- Feature 1
-- Feature 2
-
-## Configuration
-
-\`\`\`yaml
-# Your .qoderrules content
-\`\`\`
+```bash
+# Example command
 ```
 
-### 2. Share Your Skills
+## Notes
 
-Contribute skills to help the community:
+- Note 1
+```
 
-1. Create a new file in `src/content/skills/your-skill-name.md`
-2. Follow the skill template format
-3. Include clear instructions and examples
-
-### 3. Suggest Videos
-
-Know a great Qoder tutorial or demo? Submit a video suggestion:
-
-1. Open an [Issue](https://github.com/Qoder-AI/qoder-community/issues/new?template=video-suggestion.md)
-2. Fill in the video details
-3. We'll review and add it to the community
-
-### 4. Organize a Meetup
-
-Want to host a Qoder meetup in your city?
-
-1. Open an [Issue](https://github.com/Qoder-AI/qoder-community/issues/new?template=meetup-proposal.md)
-2. Provide event details
-3. We'll help promote it
-
-### 5. Improve Documentation
+### 2. Improve Documentation
 
 Found a typo or want to improve docs?
 
@@ -118,24 +102,12 @@ npm run preview
 
 ## Content Guidelines
 
-### For Agent Configurations
+### For Agent Skills
 
-- Include clear descriptions
-- Explain the use case
-- Provide example prompts if applicable
-- Test your configuration before sharing
-
-### For Skills
-
-- Write clear, step-by-step instructions
-- Include code examples
-- Test in both English and Chinese if possible
-
-### For Videos
-
-- Must be relevant to Qoder or AI coding
-- No promotional/spam content
-- Include accurate timestamps if referencing specific parts
+- Write clear, step-by-step instructions.
+- Include code examples and use cases.
+- Test your skill in both English and Chinese if possible.
+- Ensure the frontmatter follows the required schema.
 
 ## Code of Conduct
 
@@ -147,8 +119,6 @@ npm run preview
 ## Questions?
 
 - Open a [Discussion](https://github.com/Qoder-AI/qoder-community/discussions)
-- Join our [Discord](https://discord.gg/8NrHCxESyQ)
-
 ---
 
 Thank you for contributing! 🎉

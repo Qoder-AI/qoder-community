@@ -26,6 +26,8 @@ Global community platform for Qoder developers - share agents, learn together, b
 qoder-community/
 ├── src/
 │   ├── content/
+│   │   ├── skills/        # Agent skills (English)
+│   │   ├── skills-zh/     # Agent skills (Chinese)
 │   │   ├── agents/        # Community agent configurations
 │   │   ├── videos/        # Tutorial videos
 │   │   ├── meetups/       # Global meetup events
@@ -75,67 +77,11 @@ npm run build
 npm run preview
 ```
 
-## Community Content
+## How to Contribute
 
-### Add Agent Configuration
+We currently welcome contributions for **Agent Skills**. Help the community by sharing your specialized skills!
 
-Create a file in `src/content/agents/`:
-
-```markdown
----
-title: "Your Agent Name"
-description: "Brief description"
-author:
-  name: "Your Name"
-  avatar: "https://github.com/username.png"
-  url: "https://github.com/username"
-githubUrl: "https://github.com/username/repo"
-tags: ["Next.js", "TypeScript"]
-category: "Full-Stack"
-useCase: "Web applications"
-date: 2025-01-06
-featured: false
----
-
-# Your agents.md content here
-```
-
-### Add Video
-
-Create a file in `src/content/videos/`:
-
-```markdown
----
-title: "Video Title"
-description: "Video description"
-youtubeId: "VIDEO_ID"
-channel: "Channel Name"
-channelUrl: "https://youtube.com/@channel"
-duration: "12:34"
-category: "Tutorial"
-tags: ["AI Coding", "Tutorial"]
-date: 2025-01-06
-featured: false
----
-```
-
-### Add Meetup
-
-Create a file in `src/content/meetups/`:
-
-```markdown
----
-title: "Meetup Title"
-location: "City, Country"
-date: 2025-02-01
-status: "upcoming"
-registrationUrl: "https://eventbrite.com/..."
-capacity: 100
-image: "https://..."
-organizer: "Your Name"
-topics: ["AI Coding", "Networking"]
----
-```
+For detailed instructions on how to add and format your skills, please refer to our **[Contributing Guide](CONTRIBUTING.md)**.
 
 ## Deployment
 
