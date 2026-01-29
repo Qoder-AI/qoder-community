@@ -1,5 +1,10 @@
 # Contributing to Qoder Community
 
+[English](#english) | [简体中文](#简体中文)
+
+<a name="english"></a>
+# Contributing to Qoder Community (English)
+
 Thank you for your interest in contributing to the Qoder Community! This guide will help you get started.
 
 ## Ways to Contribute
@@ -15,7 +20,7 @@ We currently welcome contributions for **Agent Skills**. Help the community by s
 
 **Skill Template:**
 
-```markdown
+````markdown
 ---
 name: skill-name
 title: Skill Title
@@ -53,7 +58,7 @@ date: 2026-01-01
 ## Notes
 
 - Note 1
-```
+````
 
 ### 2. Improve Documentation
 
@@ -122,3 +127,132 @@ npm run preview
 ---
 
 Thank you for contributing! 🎉
+
+---
+
+<a name="简体中文"></a>
+# 贡献指南 (简体中文)
+
+感谢您对 Qoder 社区的感兴趣！本指南将帮助您开始贡献。
+
+## 贡献方式
+
+我们目前欢迎对 **Agent Skills** 的贡献。分享您的专业技能，帮助社区提升 AI Agent 的能力！
+
+### 1. 分享您的 Agent Skills
+
+1. Fork 本仓库。
+2. 在 `src/content/skills/your-skill-name.md`（英文）和/或 `src/content/skills-zh/your-skill-name.md`（中文）中创建新文件。
+3. 使用下面的模板。
+4. 提交 Pull Request。
+
+**Skill 模板：**
+
+````markdown
+---
+name: skill-name
+title: Skill 标题
+description: 简要描述此 Skill 的功能
+source: community
+author: 您的名字
+githubUrl: https://github.com/username/skill
+docsUrl: https://example.com/docs
+category: development # development | design | marketing | productivity | automation | data | security | document | meta
+tags:
+  - 标签1
+  - 标签2
+roles:
+  - developer
+featured: false
+popular: false
+isOfficial: false
+installCommand: |
+  git clone https://github.com/username/skill
+  cp -r skill-name ~/.qoder/skills/
+date: 2026-01-01
+---
+
+## 使用场景
+
+- 场景 1
+- 场景 2
+
+## 示例
+
+```bash
+# 示例命令
+```
+
+## 注意事项
+
+- 注意事项 1
+````
+
+### 2. 改进文档
+
+发现错别字或想改进文档？
+
+1. 直接在 GitHub 上编辑文件
+2. 提交 Pull Request
+3. 我们将审核并合并
+
+## 开发设置
+
+### 前提条件
+
+- Node.js 18+
+- npm 或 pnpm
+
+### 本地开发
+
+```bash
+# 克隆仓库
+git clone https://github.com/Qoder-AI/qoder-community.git
+cd qoder-community
+
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm run dev
+
+# 访问 http://localhost:4321
+```
+
+### 构建
+
+```bash
+npm run build
+npm run preview
+```
+
+## Pull Request 指南
+
+1. **每个 PR 仅限一个功能** - 保持 PR 聚焦且易于评审
+2. **清晰的描述** - 解释做了什么以及为什么要这么做
+3. **本地测试** - 确保 `npm run build` 通过
+4. **遵循现有风格** - 与代码/内容风格保持一致
+
+## 内容指南
+
+### 关于 Agent Skills
+
+- 编写清晰、逐步的说明。
+- 包含代码示例和使用场景。
+- 如果可能，请测试您的 Skill 的英文和中文版本。
+- 确保 Frontmatter 符合要求的 Schema。
+
+## 行为准则
+
+- 保持尊重和包容
+- 帮助他人学习
+- 在适当的地方给予致谢
+- 不发送垃圾信息或无意义的自我推广
+
+## 有疑问？
+
+- 发起 [Discussion](https://github.com/Qoder-AI/qoder-community/discussions)
+
+---
+
+感谢您的贡献！🎉
