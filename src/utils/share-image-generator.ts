@@ -52,8 +52,8 @@ async function imageExists(src: string): Promise<boolean> {
  * Falls back to category default if skill-specific image doesn't exist
  */
 async function getShareImagePath(slug: string, category: string): Promise<string> {
-  const skillImagePath = `/images/skills/share/${slug}-share.png`;
-  const defaultImagePath = `/images/skills/share/default-${category}.png`;
+  const skillImagePath = `/images/skills/share/${slug}-share.jpg`;
+  const defaultImagePath = `/images/skills/share/default-${category}.jpg`;
   
   if (await imageExists(skillImagePath)) {
     return skillImagePath;
