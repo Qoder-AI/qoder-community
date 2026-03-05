@@ -1,37 +1,55 @@
 ---
-name: skill-name
-title: Skill 标题
-description: 简要描述此 Skill 的功能
+name: openclaw-qoder-cli-setup
+title: OpenClaw + DingTalk Bot + Qoder CLI Deployment Guide
+description: A complete deployment guide for installing OpenClaw on Alibaba Cloud servers, configuring DingTalk bot integration, and connecting Qoder CLI. Supports both Compute Nest one-click deployment and manual ECS configuration, enabling AI assistant conversations via DingTalk IM and code development capabilities.
 source: community
 author: joyce
-githubUrl: https://github.com/username/skill
-docsUrl: https://example.com/docs
-category: development # development | design | marketing | productivity | automation | data | security | document | meta
+githubUrl: https://github.com/joyce/openclaw-qoder-cli-setup
+docsUrl: https://github.com/joyce/openclaw-qoder-cli-setup/blob/main/README.md
+category: automation
 tags:
-  - 标签1
-  - 标签2
+  - openclaw
+  - dingtalk
+  - alibaba-cloud
+  - ai-assistant
+  - bot
+  - deployment
+  - qoder
 roles:
   - developer
+  - devops
 featured: false
 popular: false
 isOfficial: false
 installCommand: |
-  git clone https://github.com/username/skill
-  cp -r skill-name ~/.qoder/skills/
-date: 2026-01-01
+  git clone https://github.com/joyce/openclaw-qoder-cli-setup.git
+  cp -r openclaw-qoder-cli-setup ~/.qoder/skills/
+date: 2026-03-05
 ---
 
-## 使用场景
+## Use Cases
 
-- 场景 1
-- 场景 2
+- Quickly deploy OpenClaw AI assistant service on Alibaba Cloud servers
+- Configure DingTalk enterprise internal bots for team AI conversations
+- Integrate Qoder CLI to enable AI assistant with code development capabilities
+- Build enterprise internal AI intelligent assistant infrastructure
 
-## 示例
+## Examples
 
 ```bash
-# 示例命令
+# Load the skill and follow the guide for step-by-step deployment
+/openclaw-qoder-cli-setup
+
+# After deployment, @mention the bot in DingTalk group
+@OpenClaw Assistant help me write a Python web scraper
+
+# Use Qoder for code development
+@OpenClaw Assistant use qoder to create a React project
 ```
 
-## 注意事项
+## Notes
 
-- 注意事项 1
+- Requires Alibaba Cloud account and DingTalk developer account (enterprise admin privileges)
+- Server must open port 18789 (OpenClaw Gateway)
+- DingTalk app requires applying for relevant permissions and waiting for approval
+- Stream mode is recommended, no public callback URL configuration needed
