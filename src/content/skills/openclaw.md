@@ -3,9 +3,9 @@ name: openclaw-qoder-cli-setup
 title: OpenClaw + DingTalk Bot + Qoder CLI Deployment Guide
 description: A complete deployment guide for installing OpenClaw on Alibaba Cloud servers, configuring DingTalk bot integration, and connecting Qoder CLI. Supports both Compute Nest one-click deployment and manual ECS configuration, enabling AI assistant conversations via DingTalk IM and code development capabilities.
 source: community
-author: joyce
-githubUrl: https://github.com/joyce/openclaw-qoder-cli-setup
-docsUrl: https://github.com/joyce/openclaw-qoder-cli-setup/blob/main/README.md
+author: Nathan
+githubUrl: https://github.com/Qoder-AI/qoder-community/blob/main/src/content/skills-zh/openclaw.md
+docsUrl: https://github.com/Qoder-AI/qoder-community/blob/main/src/content/skills-zh/openclaw.md
 category: automation
 tags:
   - openclaw
