@@ -22,8 +22,8 @@ featured: false
 popular: false
 isOfficial: false
 installCommand: |
-  git clone https://github.com/joyce/openclaw-qoder-cli-setup.git
-  cp -r openclaw-qoder-cli-setup ~/.qoder/skills/
+  git clone https://github.com/Qoder-AI/qoder-community.git
+  cp -r qoder-community/src/content/skills-zh/openclaw.md ~/.qoder/skills/
 date: 2026-03-05
 ---
 
