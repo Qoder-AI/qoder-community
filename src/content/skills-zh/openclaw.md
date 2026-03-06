@@ -4,8 +4,8 @@ title: OpenClaw + 钉钉机器人 + Qoder CLI 部署指南
 description: 在阿里云服务器上安装 OpenClaw、配置IM机器人集成，并对接 Qoder CLI 的完整部署指南。支持一键部署和手动 ECS 配置，实现通过 IM 与 AI 助手对话，以及代码开发能力。
 source: community
 author: joyce
-githubUrl: https://github.com/joyce/openclaw-qoder-cli-setup
-docsUrl: https://github.com/joyce/openclaw-qoder-cli-setup/blob/main/README.md
+githubUrl: https://github.com/Qoder-AI/qoder-community/blob/main/src/content/skills-zh/openclaw.md
+docsUrl: https://github.com/Qoder-AI/qoder-community/blob/main/src/content/skills-zh/openclaw.md
 category: automation
 tags:
   - openclaw
