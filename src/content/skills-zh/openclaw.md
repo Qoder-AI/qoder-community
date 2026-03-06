@@ -20,9 +20,7 @@ roles:
 featured: false
 popular: false
 isOfficial: false
-installCommand: |
- git clone https://github.com/Qoder-AI/qoder-community.git
- cp -r qoder-community/src/content/skills-zh/openclaw.md ~/.qoder/skills/
+installCommand: npx skills add https://github.com/NathanSteelQoder/openclaw-config-qoder-integration -a qoder
 
 date: 2026-03-06
 ---
