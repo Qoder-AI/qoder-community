@@ -4,8 +4,8 @@ title: 在阿里云上部署 OpenClaw 完整指南
 description: 在阿里云服务器上部署 OpenClaw 的完整指南，涵盖阿里云百炼模型配置、飞书/钉钉/QQ/Discord 全平台接入、Qoder CLI 集成，以及高级配置与运维。
 source: community
 author: Nathan
-githubUrl: [https://github.com/openclaw/openclaw](https://github.com/Qoder-AI/qoder-community/blob/main/src/content/skills-zh/openclaw.md)
-docsUrl: [https://docs.openclaw.ai/](https://github.com/Qoder-AI/qoder-community/blob/main/src/content/skills-zh/openclaw.md)
+githubUrl: https://github.com/Qoder-AI/qoder-community/blob/main/src/content/skills-zh/openclaw.md
+docsUrl: https://github.com/Qoder-AI/qoder-community/blob/main/src/content/skills-zh/openclaw.md
 category: development
 tags:
   - openclaw
