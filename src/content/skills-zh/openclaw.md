@@ -1,27 +1,28 @@
 ---
-name: openclaw-qoder-cli-setup
-title: OpenClaw + 钉钉机器人 + Qoder CLI 部署指南
-description: 在阿里云服务器上安装 OpenClaw、配置IM机器人集成，并对接 Qoder CLI 的完整部署指南。支持一键部署和手动 ECS 配置，实现通过 IM 与 AI 助手对话，以及代码开发能力。
+name: openclaw-complete-deployment-guide
+title: 在阿里云上部署 OpenClaw 完整指南
+description: 在阿里云服务器上部署 OpenClaw 的完整指南，涵盖阿里云百炼模型配置、飞书/钉钉/QQ/Discord 全平台接入、Qoder CLI 集成，以及高级配置与运维。
 source: community
-author: joyce
-githubUrl: https://github.com/Qoder-AI/qoder-community/blob/main/src/content/skills-zh/openclaw.md
-docsUrl: https://github.com/Qoder-AI/qoder-community/blob/main/src/content/skills-zh/openclaw.md
-category: automation
+author: Nathan
+githubUrl: https://github.com/openclaw/openclaw
+docsUrl: https://docs.openclaw.ai/
+category: development
 tags:
   - openclaw
-  - 钉钉
-  - 阿里云
+  - aliyun
+  - dingtalk
+  - feishu
+  - discord
   - qoder
+  - deployment
 roles:
   - developer
-  - devops
 featured: false
 popular: false
 isOfficial: false
 installCommand: |
-  git clone https://github.com/joyce/openclaw-qoder-cli-setup.git
-  cp -r openclaw-qoder-cli-setup ~/.qoder/skills/
-date: 2026-03-05
+  curl -fsSL https://clawd.bot/install.sh | bash
+date: 2026-03-06
 ---
 
 # 在阿里云上部署 OpenClaw 完整指南
@@ -39,6 +40,44 @@ date: 2026-03-05
 3. **保护好你的 API 密钥**——使用环境变量或安全保险箱，不要硬编码在代码中
 4. **使用强随机令牌**限制 Gateway 访问，避免使用简单密码
 5. **定期轮换凭证**——特别是钉钉/飞书/QQ 等平台的应用密钥
+
+---
+
+## 使用场景
+
+- 在阿里云 ECS 服务器上从零部署 OpenClaw AI 助手
+- 通过钉钉（Stream 机器人或 DEAP 高级方案）与 AI 对话
+- 通过飞书、QQ 或 Discord 接入 OpenClaw
+- 配置阿里云百炼 Coding Plan 作为 AI 推理后端
+- 将 Qoder CLI 注册为 ACP Agent，实现钉钉/飞书中的代码开发
+
+## 示例
+
+```bash
+# 安装 OpenClaw
+curl -fsSL https://clawd.bot/install.sh | bash
+
+# 启动 Gateway
+openclaw gateway --port 18789 --verbose
+
+# 交互式配置模型和渠道
+openclaw onboard
+
+# 查看所有渠道状态
+openclaw channel list
+
+# 查看实时日志
+tail -f /tmp/openclaw-gateway.log
+```
+
+## 注意事项
+
+- 切勿在本地主力电脑部署，务必使用云服务器（如阿里云 ECS）
+- 钉钉应用必须完成「版本发布」流程，仅保存配置不生效
+- 钉钉 Client Secret、百炼 API Key、QQ 机器人密钥均只显示一次，需立即保存
+- 飞书集成需选择「WebSocket 长连接」模式，不要使用 HTTP 回调
+- 钉钉 DEAP 方案需在同一服务器运行 Connector，确保 18789 端口本地可访问
+- 建议为 Gateway 配置随机强令牌认证（`openssl rand -hex 24`）
 
 ---
 
@@ -1091,6 +1130,7 @@ openclaw channel status dingtalk   # 特定渠道状态
 - [钉钉企业内部应用开发指南](https://open.dingtalk.com/document/orgapp-server/create-an-internal-app)
 - [钉钉机器人开发文档](https://open.dingtalk.com/document/orgapp-server/robot-overview)
 - [飞书开放平台](https://open.feishu.cn/)
+- [QQ 开放平台](https://q.qq.com/)
 - [Discord Developer Portal](https://discord.com/developers/applications)
 - [ACP 协议规范](https://agentclientprotocol.com)
 - [阿里云轻量服务器文档](https://help.aliyun.com/product/58609.html)
