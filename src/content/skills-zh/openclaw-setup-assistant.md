@@ -16,7 +16,7 @@ tags:
     - maintenance
 roles:
     - developer
-    - new-user
+    - devops
 featured: false
 popular: false
 isOfficial: false
