@@ -286,6 +286,12 @@ export const skillsTranslations: Record<string, SkillTranslation> = {
     zhDescription: 'Things 3 任务管理集成，用于个人待办事项和项目管理',
   },
 
+  'work-partner-onboarding': {
+    zhName: '工作搭档初始化引导',
+    zhTitle: '工作搭档初始化引导',
+    zhDescription: '面向不会编程的普通办公人员的 onboarding 技能。通过自然对话了解用户的工作内容，推荐 QoderWork 能帮忙的事，然后建立个性化的工作目录、工作档案和工作流技能——全程不超过 10 分钟。',
+  },
+
   // === Meta Skills ===
   'skill-creator': {
     zhName: '用于创建 Skills 的 Skill',
