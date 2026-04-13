@@ -1,23 +1,11 @@
 {
-  "name": "qoder-community",
-  "type": "module",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro",
-    "capture": "node scripts/capture-screenshots.js"
+  "name": "coding-agent",
+  "version": "0.1.0",
+  "description": "Delegate coding tasks to Claude Code, OpenCode, iFlow, or qodercli via background process. Use when: (1) building/creating new features or apps, (2) reviewing PRs (spawn in temp dir), (3) refactoring large codebases, (4) iterative coding that benefits from agent-driven exploration. NOT for: simple one-liner fixes (just edit), reading a single known file (use file read), thread-bound ACP harness requests in chat, or any work in ~/clawd workspace (never spawn agents here). Claude Code: prefer --print --permission-mode bypassPermissions. OpenCode/iFlow/qodercli: run inside tmux for interactivity (PTY).",
+  "publishConfig": {
+    "registry": "https://contextlab.alibaba-inc.com/skill"
   },
-  "dependencies": {
-    "@astrojs/starlight": "^0.37.1",
-    "astro": "^5.6.1"
-  },
-  "devDependencies": {
-    "playwright": "^1.57.0"
-  },
-  "optionalDependencies": {
-    "sharp": "^0.34.2"
+  "aoneKit": {
+    "generated": true
   }
 }
