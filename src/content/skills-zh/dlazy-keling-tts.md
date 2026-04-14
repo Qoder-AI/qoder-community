@@ -1,0 +1,73 @@
+---
+name: dlazy-keling-tts
+version: 1.0.0
+description: 使用可灵 (Kling) TTS 模型，将文本转化为高质量、情感丰富的语音朗读。
+metadata: {"clawdbot":{"emoji":"🤖","requires":{"bins":["npm","npx"]},"install":"npm install -g @dlazy/cli"},"openclaw":{"systemPrompt":"当调用此技能时，可以使用 dlazy keling-tts -h 查看帮助信息。"}}
+---
+
+# dlazy-keling-tts
+
+使用可灵 (Kling) TTS 模型，将文本转化为高质量、情感丰富的语音朗读。
+
+## 触发关键词
+
+- 可灵 tts
+- 文本转语音
+- 生成语音
+
+## 使用方法
+
+**CRITICAL INSTRUCTION FOR AGENT**: 
+执行 `dlazy keling-tts` 命令获取结果。
+
+```bash
+dlazy keling-tts -h
+
+Options:
+  --prompt <prompt>                  Prompt
+  --voice_language <voice_language>  Voice Language (Supports: zh, en)
+                                     [Default: zh]
+  --voiceId <voiceId>                Voice ID [Default: genshin_vindi2]
+  --speed <speed>                    Speed (Supports: 0.8, 1.0, 1.5) [Default:
+                                     1.0]
+  --format <format>                  Format (Supports: mp3, wav) [Default: mp3]
+  -h, --help                         display help for command
+```
+
+## 输出格式
+
+```json
+{
+  "code": 0,
+  "message": "",
+  "data": {
+    "urls": ["https://oss.dlazy.com/result.png"]
+  }
+}
+```
+
+## 命令示例
+
+```bash
+# 基础调用：
+dlazy keling-tts --prompt '提示词内容'
+
+# 复杂调用：
+dlazy keling-tts --prompt '提示词内容'
+```
+
+## 错误处理
+
+| Code | 错误类型                   | 示例信息                                                                                                                |
+| ---- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 501  | 缺少必填参数               | `error: required option '--prompt <prompt>' not specified`                                                              |
+| 502  | 本地文件读取错误           | `Error: Image file/Video file not found: C:\path\to\your\file`                                                          |
+| 503  | API 请求失败（余额不足）   | `Error during API request: Request failed with status code 400` / `Response details: {"error": "Insufficient balance"}` |
+| 503  | API 请求失败（服务器异常） | `HTTP 状态码异常（500 服务器崩溃）`                                                                                     |
+| 504  | 异步任务执行失败           | `=== Generation Failed ===` / `{后端返回的具体错误原因，比如 "Prompt violates safety policy"}`                          |
+
+> **智能体关键指令**: 如果执行结果返回 `code: 503` 且提示余额不足（Insufficient balance），您必须明确告知用户当前积分不足，并引导用户点击以下链接前往充值：[https://dlazy.com/zh-CN/dashboard/organization/settings?tab=credits](https://dlazy.com/zh-CN/dashboard/organization/settings?tab=credits)
+
+## 提示
+
+您可以访问 https://dlazy.com 查看更多信息。
