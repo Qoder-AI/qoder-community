@@ -1,16 +1,16 @@
 ---
 name: gzh-10w-article-recommend
-title: 公众号热门文章 TOP10 推荐
-description: 根据用户输入关键词调用脚本，获取公众号热门文章数据，输出可读的 TOP10 文本榜单并生成 HTML 卡片预览。
+title: Top 10 WeChat Popular Article Recommendations
+description: Calls a script based on user keywords to fetch popular WeChat article data, outputs a readable Top 10 text ranking, and generates an HTML card preview.
 source: community
 author: yuanyi-github
 githubUrl: https://github.com/yuanyi-github/skills
 category: marketing
 tags:
-  - 公众号
-  - 热门文章
-  - 榜单推荐
-  - html预览
+  - WeChat Official Accounts
+  - Popular Articles
+  - Ranking Recommendations
+  - HTML Preview
 roles:
   - assistant
 featured: false
@@ -22,13 +22,13 @@ installCommand: |
 date: 2026-04-27
 ---
 
-## 使用场景
+## Use Cases
 
-- 用户希望按关键词查看公众号热门文章并获得可参考的 TOP10 榜单
-- 需要同时得到文本输出与 HTML 卡片化预览，便于快速浏览与分享
-- 需要按阅读数排序并携带点赞、评论、分享等互动指标
+- Users want to view popular WeChat articles by keyword and get a referenceable Top 10 ranking.
+- Users need both text output and HTML card-based preview for quick browsing and sharing.
+- Users need ranking by read count with engagement metrics such as likes, comments, and shares.
 
-## 示例
+## Example
 
 ```bash
 python scripts/fetch_explosive_articles.py \
@@ -37,9 +37,9 @@ python scripts/fetch_explosive_articles.py \
   --expansion_words '[]'
 ```
 
-## 注意事项
+## Notes
 
-- 严格执行完整流程：接收输入、分词、调用脚本、输出文本榜单、生成并展示 HTML
-- 文本榜单与 HTML 预览必须同时提供，不可只输出其中一种
-- 榜单以脚本返回数据为准，通常展示阅读数靠前的前 10 条，不足则按实际数量展示
-- 互动与阅读数据可能存在入库延迟，非实时口径
+- Follow the complete workflow strictly: receive input, tokenize, call the script, output the text ranking, then generate and display HTML.
+- The text ranking and HTML preview must both be provided; do not provide only one.
+- The ranking is based on script-returned data, usually showing the top 10 by read count; if fewer are available, show the actual number.
+- Engagement and read metrics may have ingestion delay and are not real-time values.
