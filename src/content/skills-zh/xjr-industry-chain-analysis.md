@@ -1,7 +1,30 @@
 ---
-name: xjr-industry-chain-analysis    
+name: xjr-industry-chain-analysis
+title: 专精特新“小巨人”申报
 description: 对企业产业链定位描述进行系统性诊断分析，识别结构、内容、语言等问题并给出可操作的修改建议。用于专精特新"小巨人"企业申报第二部分所属产业链的审阅与优化，或在用户提交产业链定位文字时触发。
+source: community
+author: 15168428852
+githubUrl: https://github.com/15168428852/skills/tree/main/skills/xjr-industry-chain-analysis
+category: business
+tags:
+  - 专精特新
+  - 小巨人
+  - 产业链
+  - 申报诊断
+  - 定性分析
+roles:
+  - consultant
+  - policy-advisor
+  - 申报专员
+featured: false
+popular: false
+isOfficial: true
+installCommand: |
+  git clone https://github.com/15168428852/skills
+  cp -r skills/xjr-industry-chain-analysis ~/.qoder/skills/
+date: 2026-05-17
 ---
+
 # 专精特新“小巨人”申报
 
 ## 触发条件
