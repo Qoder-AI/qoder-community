@@ -8,12 +8,15 @@ githubUrl: https://github.com/ai-shifu/skills/tree/main/skills/ai-shifu-course-c
 docsUrl: https://ai-shifu.cn
 category: productivity
 tags:
+  - ai-shifu
   - ai-course
   - course-production
   - instructional-design
+  - markdownflow
+  - education
+  - ai-tutor
 roles:
   - content
-  - pm
 featured: false
 popular: false
 isOfficial: false
@@ -31,12 +34,14 @@ date: 2026-05-17
 
 ## Core Capabilities
 
-- **Five-phase pipeline**: Segmentation → Orchestration → Generation → Optimization → Deployment
-- **MarkdownFlow (MDF) authoring**: directive-style prompts, prompt-outside / options-inside interaction syntax, mandatory anchoring with downstream effects
-- **Pedagogy-aware**: variable strategy, interaction design, visual-text coordination, language resolution
-- **Standard & fallback modes**: gracefully handles incomplete or low-quality source material
-- **Live deployment**: build, import, and publish directly to the AI-Shifu platform
-- **Creator analytics**: track learner progress, identify stuck lessons, monitor revenue and ratings
+AI-Shifu courses are one-on-one interactive AI tutor sessions — instead of passive video or text, each learner gets an adaptive AI tutor that asks questions, branches based on answers, and personalizes the explanation. This skill helps you produce, deploy, and manage such courses.
+
+- **Two ways to start**: convert your existing material (PPT, Word, PDF, txt, transcripts) into a course, or build a course from just a topic and a description of who you're teaching
+- **Interactive lessons**: script questions, choices, free input, and branching the AI tutor will follow
+- **Per-learner personalization**: adapt explanations, examples, and difficulty to each learner's background and level
+- **Rich content**: combine text, images, and slides within a single lesson
+- **One-click deployment**: publish courses live to the AI-Shifu platform
+- **Course management & analytics**: view your published courses and track learner count, completion rate, stuck lessons, orders, revenue, and ratings
 
 ## Example
 
