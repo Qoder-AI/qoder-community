@@ -1,0 +1,67 @@
+---
+name: event-tracking-skill
+title: Event Tracking Skill — GA4 + GTM Setup via AI
+description: Set up reviewable GA4 event tracking in GTM with site analysis, schema generation, sync, and preview verification. Works as an AI agent skill or standalone CLI.
+source: community
+author: JTracking
+githubUrl: https://github.com/jtrackingai/event-tracking-skill
+docsUrl: https://github.com/jtrackingai/event-tracking-skill/blob/main/SKILL.md
+category: marketing
+tags:
+  - ga4
+  - gtm
+  - google-tag-manager
+  - event-tracking
+  - analytics
+  - measurement-plan
+  - shopify
+roles:
+  - developer
+  - marketer
+featured: false
+popular: false
+isOfficial: false
+installCommand: |
+  git clone https://github.com/jtrackingai/event-tracking-skill.git
+  cd event-tracking-skill
+  npm ci
+  npm run build
+date: 2026-04-03
+---
+
+## Use Cases
+
+- Analyze a website's page structure and generate a complete GA4 measurement plan — events, properties, and naming conventions.
+- Generate GTM-ready tags, triggers, and variables from an approved event schema, then sync directly to a GTM workspace.
+- Validate tracking in GTM Preview Mode before publishing — get a clear report on which events fired and which need fixes.
+- Support Shopify storefronts with a dedicated branch: custom pixel generation and manual verification flow.
+- Keep the entire tracking workflow artifact-driven and reviewable, from crawl to publish.
+
+## Example
+
+Use it as an AI agent skill with a natural-language prompt:
+
+```text
+Use event-tracking-skill to set up GA4 / GTM tracking for https://www.example.com.
+Use ./output as the output root directory.
+GA4 Measurement ID is G-XXXXXXXXXX.
+```
+
+Or use it as a CLI:
+
+```bash
+node dist/cli.js analyze https://www.example.com --output-root ./output
+node dist/cli.js confirm-page-groups ./output/example_com/site-analysis.json
+node dist/cli.js prepare-schema ./output/example_com/site-analysis.json
+node dist/cli.js generate-gtm ./output/example_com/event-schema.json --measurement-id G-XXXXXXXXXX
+node dist/cli.js sync ./output/example_com/gtm-config.json
+node dist/cli.js preview ./output/example_com/event-schema.json --context-file ./output/example_com/gtm-context.json
+node dist/cli.js publish --context-file ./output/example_com/gtm-context.json --version-name "GA4 Events v1"
+```
+
+## Notes
+
+- Requires Node.js 18+. `npm ci` also installs Playwright Chromium for crawl and preview steps.
+- The skill runs locally and does not require JTracking product authorization; GTM sync uses Google OAuth.
+- Generic sites are validated via GTM Preview Mode; Shopify stores use a custom pixel + manual verification flow.
+- All artifacts (site-analysis.json, event-schema.json, gtm-config.json, preview-report.md, etc.) are saved to a single run directory for traceability.
