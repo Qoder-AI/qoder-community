@@ -145,6 +145,11 @@ export const skillsTranslations: Record<string, SkillTranslation> = {
     zhTitle: 'AWS 开发技能',
     zhDescription: 'AWS 开发和基础设施自动化，包括 CDK、Lambda、S3 和其他服务',
   },
+  'investoday-finance-data': {
+    zhName: '今日投资金融数据',
+    zhTitle: '今日投资金融数据',
+    zhDescription: '通过 CLI 获取 A 股、港股、基金、指数、财务、公告、研报和宏观等中国市场结构化金融数据',
+  },
   'dev-agent-skills': {
     zhName: 'Git & GitHub 工作流',
     zhTitle: 'Git & GitHub 工作流',
