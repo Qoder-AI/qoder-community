@@ -150,6 +150,66 @@ export const skillsTranslations: Record<string, SkillTranslation> = {
     zhTitle: '今日投资金融数据',
     zhDescription: '通过 CLI 获取 A 股、港股、基金、指数、财务、公告、研报和宏观等中国市场结构化金融数据',
   },
+  'investoday-stock-anomaly-analysis': {
+    zhName: '个股异动分析',
+    zhTitle: '个股异动分析',
+    zhDescription: '面向A股个股异动归因分析，聚焦上涨下跌原因、大盘影响、板块共振、公司事件与机构验证。基于今日投资金融数据接口，自动识别股票代码并输出结构化异动解读报告。触发词：异动分析、为什么涨、为什么跌、拉升、跳水、盘中异动。',
+  },
+  'investoday-stock-valuation-analysis': {
+    zhName: '股票估值分析',
+    zhTitle: '股票估值分析',
+    zhDescription: '面向A股个股估值分析，聚焦PE、PB、PS、PEG、历史分位、行业比较与估值匹配度判断。基于今日投资金融数据接口，自动识别股票代码并输出结构化估值分析报告。触发词：估值分析、贵不贵、便宜不便宜、历史分位、PEG、PE、PB。',
+  },
+  'investoday-stock-technical-analysis': {
+    zhName: '股票技术分析',
+    zhTitle: '股票技术分析',
+    zhDescription: '面向A股个股技术面分析，聚焦趋势、均线、MACD、布林带、量能确认与支撑压力结构。基于今日投资金融数据接口，自动识别股票代码并输出结构化技术分析报告。触发词：技术分析、技术面、均线、MACD、布林带、趋势、支撑压力。',
+  },
+  'investoday-stock-message-analysis': {
+    zhName: '股票消息解读',
+    zhTitle: '股票消息解读',
+    zhDescription: '面向A股个股消息解读，聚焦近期新闻、事件情绪、机构验证与市场反馈。基于今日投资金融数据接口，自动识别股票代码并输出结构化消息解读报告。触发词：最近新闻、消息面、消息解读、事件驱动、利好利空、催化、风险消息。',
+  },
+  'investoday-stock-financial-analysis': {
+    zhName: '股票财务分析',
+    zhTitle: '股票财务分析',
+    zhDescription: '面向A股个股财务质量分析，聚焦盈利能力、利润质量、成长持续性、现金流与财务安全性。基于今日投资金融数据接口，自动识别股票代码并输出结构化财务分析报告。触发词：财务分析、盈利能力、现金流、资产负债、偿债能力、利润质量。',
+  },
+  'investoday-fund-performance-attribution-analysis': {
+    zhName: '基金业绩归因分析',
+    zhTitle: '基金业绩归因分析',
+    zhDescription: '面向公募基金业绩归因分析，聚焦超额收益来源、选股能力、择时能力、配置支撑与业绩可持续性。基于今日投资金融数据接口，自动识别基金代码并输出结构化基金业绩归因报告。触发词：业绩归因、超额收益、选股能力、择时能力、业绩来源、主动管理能力。',
+  },
+  'investoday-fund-comprehensive-diagnosis': {
+    zhName: '基金综合诊断',
+    zhTitle: '基金综合诊断',
+    zhDescription: '面向公募基金综合诊断，聚焦收益表现、风险收益匹配、持仓结构、基金经理与费用分红特征。基于今日投资金融数据接口，自动识别基金代码并输出结构化基金综合诊断报告。触发词：基金诊断、基金分析、收益风险、持仓怎么看、长期持有、基金体检。',
+  },
+  'investoday-fund-risk-analysis': {
+    zhName: '基金风险分析',
+    zhTitle: '基金风险分析',
+    zhDescription: '面向公募基金量化风险分析，聚焦回撤、波动率、下行风险、VaR、Beta、夏普与风险收益匹配度。基于今日投资金融数据接口，自动识别基金代码并输出结构化基金风险分析报告。触发词：基金风险、回撤、波动率、下行风险、VaR、Beta、夏普、风险收益比。',
+  },
+  'investoday-stock-market-broadcast': {
+    zhName: '盘面行情播报',
+    zhTitle: '盘面行情播报',
+    zhDescription: '面向A股盘面播报与市场情绪快评，聚焦市场涨跌分布、指数表现、热点主线与盘中阶段解读。基于今日投资金融数据接口，输出口播化、结构化的盘面行情播报。触发词：盘面播报、早盘、午盘、盘中、收盘后、市场怎么样、盘面总结。',
+  },
+  'investoday-hotspot-event-decoding': {
+    zhName: '热点事件解码',
+    zhTitle: '热点事件解码',
+    zhDescription: '面向市场热点、主题赛道与行业事件解码，聚焦近期核心事件、逻辑链条、机会风险与后续验证点。基于今日投资金融数据接口，自动提炼主题关键词并输出结构化热点事件解码报告。触发词：热点解码、主题事件、赛道催化、最近有什么重要事件、这波热点意味着什么。',
+  },
+  'investoday-stock-research-interpretation': {
+    zhName: '个股研报解读',
+    zhTitle: '个股研报解读',
+    zhDescription: '面向A股个股研报解读，聚焦机构观点、评级变化、核心逻辑、机会风险与一致性判断。基于今日投资金融数据接口，自动识别股票代码并输出结构化个股研报解读报告。触发词：机构怎么看、研报解读、评级变化、卖方观点、目标价、一致预期。',
+  },
+  'investoday-sector-research-interpretation': {
+    zhName: '板块研报解读',
+    zhTitle: '板块研报解读',
+    zhDescription: '面向行业、板块、概念与主题方向的研报解读，聚焦卖方共识、核心逻辑、机会风险与代表性方向。基于今日投资金融数据接口，自动识别行业或概念实体并输出结构化板块研报解读报告。触发词：板块研报、行业观点、赛道共识、主题分歧、重点关注方向。',
+  },
   'dev-agent-skills': {
     zhName: 'Git & GitHub 工作流',
     zhTitle: 'Git & GitHub 工作流',
