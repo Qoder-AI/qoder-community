@@ -311,6 +311,11 @@ export const skillsTranslations: Record<string, SkillTranslation> = {
     zhTitle: '向量搜索',
     zhDescription: '使用向量搜索进行语义文件查找和相似度匹配',
   },
+  'iflow-search': {
+    // No zhName - keep brand slug 'iflow-search'
+    zhTitle: 'iFlow 心流搜索',
+    zhDescription: '通过 iFlow Search API 提供网页搜索、图片搜索和网页抓取能力的社区 skill。',
+  },
 
   // === Security Skills ===
   'building-secure-contracts': {
