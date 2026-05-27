@@ -3,7 +3,7 @@ name: b-antd
 title: 高德B端PC设计规范
 description: Generate React + Ant Design code that strictly follows Gaode B-end PC design specs for list, form, detail, report, and composed admin pages
 source: community
-author: mandy
+author: 漫迪
 githubUrl: https://github.com/liuman0722/b-antd
 category: development
 tags:
