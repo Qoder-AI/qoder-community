@@ -1,7 +1,7 @@
 ---
 name: b-antd
-title: Gaode B-End Ant Design
-description: Generate React + Ant Design admin pages that follow Gaode enterprise desktop UI rules for list, form, detail, report, and composed workflow pages
+title: 高德B端PC设计规范
+description: Generate React + Ant Design code that strictly follows Gaode B-end PC design specs for list, form, detail, report, and composed admin pages
 source: community
 author: mandy
 githubUrl: https://github.com/liuman0722/b-antd
@@ -9,9 +9,10 @@ category: development
 tags:
  - antd
  - react
+ - gaode
  - admin
- - enterprise
  - design-system
+ - b-end
 roles:
  - developer
  - designer
@@ -26,32 +27,32 @@ date: 2026-05-26
 
 ## Use Cases
 
-- Generate B-end list pages with filter cards, tables, batch actions, and pagination
-- Build single-column, multi-column, step, and preview forms with Ant Design
-- Create report pages with KPI cards, charts, detail tables, and AI insight modules
-- Standardize page layout, spacing, breadcrumb and title rules, and header and card behavior
-- Convert product-manager style requirements into runnable React + Ant Design pages
+- Build Gaode B-end PC list pages with filter cards, tables, pagination, and batch actions
+- Generate single-column, multi-column, step, and preview forms with Ant Design
+- Create report pages with KPI cards, charts, detail tables, and optional AI insight blocks
+- Enforce layout rules for headers, siders, filter placement, table action columns, and card spacing
+- Turn product-style natural language requirements into runnable React + Ant Design pages
 
 ## Core Capabilities
 
-- **Page Typing**: Infer list, form, detail, report, exception, and composed workflow pages from natural-language requirements
-- **Strict Layout Rules**: Enforce filter placement, button order, table action columns, card spacing, and fixed header and sider behavior
-- **Report Expertise**: Cover KPI card shapes, metric-to-chart linkage, chart grid layout, and optional AI sections
-- **Ant Design v5 First**: Prefer official components, tokens, and interaction patterns instead of custom UI abstractions
-- **PM-Friendly Defaults**: Fill in missing details with safe defaults and mark follow-up items without blocking delivery
+- **Gaode B-end PC Specs**: Strict layout, spacing, filter, table, form, and report patterns for enterprise admin UIs
+- **Page Typing**: Infer list, form, detail, report, exception, and composed workflow pages from requirements
+- **Report Expertise**: KPI card variants, metric-to-chart linkage, chart grids, and optional AI-themed sections
+- **Ant Design v5 First**: Official components, tokens, and `items`-based Menu/Breadcrumb APIs
+- **PM-Friendly Defaults**: Ship a minimal runnable page first, then mark follow-up items without blocking delivery
 
 ## Example
 
 ```text
-Use b-antd to build a merchant order management list page.
-Business goal: Help operations search and manage orders efficiently.
-Key fields: order number, merchant name, amount, status, created time.
-Core actions: query, reset, pagination, batch delete, create.
-Please follow the b-antd layout rules and wire it into the current React + Ant Design project.
+Use b-antd to build a merchant order list page for a Gaode B-end PC admin console.
+Filters: order ID, status, order time.
+Columns: order ID, buyer, amount, status, created time, actions.
+Features: pagination, batch delete, primary button "Create Order".
+Follow Gaode B-end PC design rules and wire into the current React + Ant Design project.
 ```
 
 ## Notes
 
-- Best suited for Chinese enterprise desktop products built with React + Ant Design
-- Designed around Gaode B-end PC page patterns and Ant Design v5 conventions
-- Includes `references/`, `assets/`, and helper scripts for reusable page scaffolding
+- Skill ID is `b-antd`; display name is **Gaode B-end PC Design Specs** (高德B端PC设计规范)
+- Best for Chinese enterprise desktop / merchant admin products on React + Ant Design
+- Full rules live in `SKILL.md`; `references/`, `assets/`, and helper scripts are included
