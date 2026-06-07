@@ -41,6 +41,18 @@ date: 2026-06-08
 - **Exchange System**: Search exchange program information and related notices.
 - **Youth League**: Retrieve recent Youth League news and announcement updates.
 
+## Screenshots
+
+<p align="center">
+  <img alt="NJU CLI" width="20%" src="https://github.com/user-attachments/assets/d78d6040-8262-420d-892b-86d7b04afd16" />
+</p>
+
+| Thesis deadline | Graduation checklist |
+| :--------------: | :------------------: |
+| <img width="100%" alt="Thesis deadline screenshot" src="https://github.com/user-attachments/assets/de0576c9-6f95-4814-bf6a-f31fd13fae43" /> | <img width="100%" alt="Graduation checklist screenshot" src="https://github.com/user-attachments/assets/bbee4ab4-f631-4bbe-999d-46b7abecc0fb" /> |
+| Course graduation check | Party membership guidance |
+| <img width="927" height="910" alt="Course graduation check screenshot" src="https://github.com/user-attachments/assets/3258646e-87f3-40eb-8c73-a98a454d9d60" /> | <img width="949" height="1389" alt="Party membership guidance screenshot" src="https://github.com/user-attachments/assets/94d65e26-569a-4141-b464-e076852dda24" /> |
+
 ## Example
 
 ```
