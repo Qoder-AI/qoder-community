@@ -3,7 +3,7 @@ name: yescan-ocr-qoder
 title: 夸克扫描王 OCR - 通用文字识别
 description: 从图片、截图、照片或扫描文档中提取、识别和结构化文本——支持手写体、表格、数学公式、身份证、发票、医疗报告、营业执照等 17 种场景。由夸克扫描王 OCR API 提供支持。
 source: community
-author: changri
+author: yescan-ai
 githubUrl: https://github.com/yescan-ai/yescan-ocr-qoder
 docsUrl: https://scan.quark.cn/business
 category: document
