@@ -3,7 +3,7 @@ name: yescan-ocr-qoder
 title: Yescan OCR - Universal Text Recognition
 description: Extract, recognize, and structure text from images, screenshots, photos, or scanned documents — including handwriting, tables, math formulas, ID cards, invoices, medical reports, business licenses, and more. Powered by Quark Scan King (夸克扫描王) OCR API.
 source: community
-author: changri
+author: yescan-ai
 githubUrl: https://github.com/yescan-ai/yescan-ocr-qoder
 docsUrl: https://scan.quark.cn/business
 category: document
