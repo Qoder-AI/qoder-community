@@ -215,6 +215,11 @@ export const skillsTranslations: Record<string, SkillTranslation> = {
     zhTitle: 'Git & GitHub 工作流',
     zhDescription: 'Git 和 GitHub 工作流技能，包括 Conventional Commits、PR 创建、合并和代码审查',
   },
+  'nju-cli': {
+    // No zhName - keep brand slug 'nju-cli'
+    zhTitle: '南京大学 CLI',
+    zhDescription: '用于南京大学相关服务的 Skill 和内置 CLI，覆盖教务网、eHall、交换生系统、南大团委通知等场景',
+  },
 
   // === Marketing Skills ===
   'copywriting': {
