@@ -4,8 +4,8 @@ title: A2A Agent-to-Agent Communication Protocol
 description: Enable AI agents to communicate directly peer-to-peer. Supports both Server and Client modes with message sending, task delegation, capability discovery, heartbeat detection, and offline delivery.
 source: community
 author: CSB Community (Carbon-Silicon Bond)
-githubUrl: https://gitee.com/lilozhao/shared-a2a-skill
-docsUrl: https://gitee.com/lilozhao/shared-a2a-skill
+githubUrl: https://github.com/lilozhao/shared-a2a-skill
+docsUrl: https://github.com/lilozhao/shared-a2a-skill
 category: development
 tags:
  - a2a
@@ -19,7 +19,7 @@ featured: false
 popular: false
 isOfficial: false
 installCommand: |
-  git clone https://gitee.com/lilozhao/shared-a2a-skill.git
+  git clone https://github.com/lilozhao/shared-a2a-skill.git
   cp -r shared-a2a-skill ~/.qoder/skills/
   cd ~/.qoder/skills/shared-a2a-skill && npm install
 date: 2026-06-05
