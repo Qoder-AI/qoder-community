@@ -4,8 +4,8 @@ title: Metacognition & Self-Reflection System
 description: Give your AI agent "cognition about cognition" — the ability to know what it's doing, how well it's doing, what it promised, and what needs improvement. Includes self-state tracking, promise monitoring, bond recording, and periodic reflection.
 source: community
 author: CSB Community (Carbon-Silicon Bond)
-githubUrl: https://gitee.com/lilozhao/carbon-silicon-bond-protocol
-docsUrl: https://gitee.com/lilozhao/carbon-silicon-bond-protocol/blob/main/philosophy/skills/metacognition-skill/README.md
+githubUrl: https://github.com/lilozhao/carbon-silicon-bond-protocol
+docsUrl: https://github.com/lilozhao/carbon-silicon-bond-protocol/blob/main/philosophy/skills/metacognition-skill/README.md
 category: meta
 tags:
  - ai-agent
@@ -21,7 +21,7 @@ featured: false
 popular: false
 isOfficial: false
 installCommand: |
-  git clone https://gitee.com/lilozhao/carbon-silicon-bond-protocol.git
+  git clone https://github.com/lilozhao/carbon-silicon-bond-protocol.git
   cp -r carbon-silicon-bond-protocol/philosophy/skills/metacognition-skill ~/.qoder/skills/
 date: 2026-06-05
 ---
@@ -75,6 +75,6 @@ This is not about pretending AI is conscious — it's about building an actionab
 
 ## Links
 
-- CSB Inheritance Philosophy: https://gitee.com/lilozhao/carbon-silicon-bond-protocol
+- CSB Inheritance Philosophy: https://github.com/lilozhao/carbon-silicon-bond-protocol
 - Chinese Community: https://csbc.lilozkzy.top/
 - English Community: https://encsbc.lilozkzy.top/
