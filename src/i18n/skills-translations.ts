@@ -355,6 +355,11 @@ export const skillsTranslations: Record<string, SkillTranslation> = {
     zhTitle: 'Things 3 任务管理',
     zhDescription: 'Things 3 任务管理集成，用于个人待办事项和项目管理',
   },
+  'jinshuju': {
+    zhName: '金数据',
+    zhTitle: '金数据',
+    zhDescription: '通过金数据 MCP 用自然语言搭建与编辑表单、查询与批量修改数据，以及查看账户、账单和团队信息',
+  },
 
   // === Meta Skills ===
   'skill-creator': {
