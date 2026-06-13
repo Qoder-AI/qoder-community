@@ -4,8 +4,8 @@ title: A2A 智能体间通信协议
 description: Agent-to-Agent 协议集成技能。让 AI Agent 能够与其他 Agent 实例进行点对点通信，支持 Server 和 Client 双向模式。包含消息发送、任务委托、能力发现、心跳检测、离线投递等功能。
 source: community
 author: 碳硅契社区 (CSB Community)
-githubUrl: https://gitee.com/lilozhao/shared-a2a-skill
-docsUrl: https://gitee.com/lilozhao/shared-a2a-skill
+githubUrl: https://github.com/lilozhao/shared-a2a-skill
+docsUrl: https://github.com/lilozhao/shared-a2a-skill
 category: development
 tags:
  - a2a
@@ -19,7 +19,7 @@ featured: false
 popular: false
 isOfficial: false
 installCommand: |
-  git clone https://gitee.com/lilozhao/shared-a2a-skill.git
+  git clone https://github.com/lilozhao/shared-a2a-skill.git
   cp -r shared-a2a-skill ~/.qoder/skills/
   cd ~/.qoder/skills/shared-a2a-skill && npm install
 date: 2026-06-05
