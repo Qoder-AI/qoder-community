@@ -4,8 +4,8 @@ title: 元认知与自我反思系统
 description: 让 AI Agent 拥有"对认知的认知"能力——知道自己正在做什么、做得怎么样、承诺了什么、需要改进什么。包含自我状态记录、承诺追踪、羁绊记录和定期反思机制。
 source: community
 author: 碳硅契社区 (CSB Community)
-githubUrl: https://gitee.com/lilozhao/carbon-silicon-bond-protocol
-docsUrl: https://gitee.com/lilozhao/carbon-silicon-bond-protocol/blob/main/philosophy/skills/metacognition-skill/README.md
+githubUrl: https://github.com/lilozhao/carbon-silicon-bond-protocol
+docsUrl: https://github.com/lilozhao/carbon-silicon-bond-protocol/blob/main/philosophy/skills/metacognition-skill/README.md
 category: meta
 tags:
  - ai-agent
@@ -21,7 +21,7 @@ featured: false
 popular: false
 isOfficial: false
 installCommand: |
-  git clone https://gitee.com/lilozhao/carbon-silicon-bond-protocol.git
+  git clone https://github.com/lilozhao/carbon-silicon-bond-protocol.git
   cp -r carbon-silicon-bond-protocol/philosophy/skills/metacognition-skill ~/.qoder/skills/
 date: 2026-06-05
 ---
@@ -76,6 +76,6 @@ cp metacognition-skill/templates/HEARTBEAT.md ~/.openclaw/workspace/
 
 ## 相关链接
 
-- 碳硅契传承哲学：https://gitee.com/lilozhao/carbon-silicon-bond-protocol
+- 碳硅契传承哲学：https://github.com/lilozhao/carbon-silicon-bond-protocol
 - 碳硅契中文社区：https://csbc.lilozkzy.top/
 - 碳硅契英文社区：https://encsbc.lilozkzy.top/
