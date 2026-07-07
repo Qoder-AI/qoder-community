@@ -46,5 +46,5 @@ cp -r dknowc-official-doc-writer-qoder ~/.qoder/skills/dknowc-official-doc-write
 
 - 当前 Qoder Public 版本为 `3.1.0`，以 ClawHub Public `3.1.0` 为功能基准。
 - 本 Skill 不内置深知搜索 API Key。首次调用时由 Agent 引导用户提供手机号和短信验证码，通过 `scripts/register.mjs` 自动注册、获取 API Key 并写入本地 `config.ini`。
-- 当前 Qoder Public 版继续使用原渠道码注册链接：`https://platform.dknowc.cn/auth/#/register?channel=2787E171-B0E5-4328-9946-47AC52434D1F&type=6`。待 Qoder 专属渠道码或注册链接确认后再替换。
+- Qoder Public 版使用专属渠道码注册链接：`https://platform.dknowc.cn/auth/#/register?channel=5DBF147C-A4D0-4C3E-AB1A-6C6F5EA39B18&type=6`。
 - Qoder Skill 源码仓库为 `https://github.com/dylanzhangzx/dknowc-official-doc-writer-qoder`。
