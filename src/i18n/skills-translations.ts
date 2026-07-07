@@ -377,6 +377,11 @@ export const skillsTranslations: Record<string, SkillTranslation> = {
     zhTitle: 'Skill 模板',
     zhDescription: '创建新 Skills 的基础模板，快速开始 Skill 开发',
   },
+  'thought-codec': {
+    zhName: '思维编解码',
+    zhTitle: 'ThoughtCodec 思维编解码',
+    zhDescription: '中英双语 AI Skill 库，用于把抽象意图解压为可执行工作流，并把反复实践压缩为可复用 Skill',
+  },
 };
 
 /**
