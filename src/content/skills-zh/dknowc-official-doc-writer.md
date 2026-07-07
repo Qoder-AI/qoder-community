@@ -21,7 +21,7 @@ isOfficial: false
 installCommand: |
   git clone https://github.com/dylanzhangzx/dknowc-official-doc-writer-qoder
   cp -r dknowc-official-doc-writer-qoder ~/.qoder/skills/dknowc-official-doc-writer
-date: 2026-07-02
+date: 2026-07-07
 ---
 
 ## 使用场景
@@ -35,6 +35,7 @@ date: 2026-07-02
 ```bash
 # 安装依赖
 pip3 install python-docx requests
+node --version
 
 # 安装到 Qoder 用户级 Skill 目录
 git clone https://github.com/dylanzhangzx/dknowc-official-doc-writer-qoder
@@ -43,6 +44,7 @@ cp -r dknowc-official-doc-writer-qoder ~/.qoder/skills/dknowc-official-doc-write
 
 ## 注意事项
 
-- 本 Skill 不内置深知搜索 API Key。首次使用深知搜索前，需要注册并配置 `config.ini`。
-- 当前 Qoder Public 版本暂沿用 ClawHub Public 注册链接：`https://platform.dknowc.cn/auth/#/register?channel=2787E171-B0E5-4328-9946-47AC52434D1F&type=6`。
+- 当前 Qoder Public 版本为 `3.1.0`，以 ClawHub Public `3.1.0` 为功能基准。
+- 本 Skill 不内置深知搜索 API Key。首次调用时由 Agent 引导用户提供手机号和短信验证码，通过 `scripts/register.mjs` 自动注册、获取 API Key 并写入本地 `config.ini`。
+- 当前 Qoder Public 版继续使用原渠道码注册链接：`https://platform.dknowc.cn/auth/#/register?channel=2787E171-B0E5-4328-9946-47AC52434D1F&type=6`。待 Qoder 专属渠道码或注册链接确认后再替换。
 - Qoder Skill 源码仓库为 `https://github.com/dylanzhangzx/dknowc-official-doc-writer-qoder`。
