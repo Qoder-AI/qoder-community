@@ -321,6 +321,11 @@ export const skillsTranslations: Record<string, SkillTranslation> = {
     zhTitle: 'iFlow 心流搜索',
     zhDescription: '通过 iFlow Search API 提供网页搜索、图片搜索和网页抓取能力的社区 skill。',
   },
+  'videodb': {
+    // No zhName - keep the VideoDB brand name
+    zhTitle: 'VideoDB - 面向视频 Agent 的感知、记忆与行动层',
+    zhDescription: 'AI Agent 的感知、记忆与行动层。通过自然语言摄取、理解、搜索、编辑、转录、添加字幕、捕获、监控和流式播放视频与音频。',
+  },
 
   // === Security Skills ===
   'building-secure-contracts': {
