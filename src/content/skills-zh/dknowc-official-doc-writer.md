@@ -21,7 +21,7 @@ isOfficial: false
 installCommand: |
   git clone https://github.com/dylanzhangzx/dknowc-official-doc-writer-qoder
   cp -r dknowc-official-doc-writer-qoder ~/.qoder/skills/dknowc-official-doc-writer
-date: 2026-07-20
+date: 2026-07-22
 ---
 
 ## 使用场景
@@ -30,6 +30,7 @@ date: 2026-07-20
 - 需要政策依据、数据支撑、标准规范或案例参考时，通过深知可信搜索整理素材，并区分政策依据型、数据支撑型、参考案例型和表述参考型材料。
 - 需要正式交付时，生成普通 `.docx`；用户明确要求红头文件时，生成红头版 Word。
 - 正式 Word 支持标准 Markdown 表格、宽表横向 A4、表题兜底和基础对齐规则；执行过搜索时，另行生成素材来源 HTML 溯源页。
+- 当前版本明确不自动生成 PDF；用户需要 PDF 时，先交付对应 Word 文件，再由用户使用本机 Word/WPS 导出。
 
 ## 示例
 
@@ -45,7 +46,7 @@ cp -r dknowc-official-doc-writer-qoder ~/.qoder/skills/dknowc-official-doc-write
 
 ## 注意事项
 
-- 当前 Qoder Public 版本为 `3.1.1`，功能逻辑与主干完整版保持一致。
+- 当前 Qoder Public 版本为 `3.1.4`，功能逻辑与主干完整版保持一致。
 - 本 Skill 不内置深知搜索 API Key。首次调用时由 Agent 引导用户提供手机号和短信验证码，通过 `scripts/register.mjs` 自动注册、获取 API Key 并写入本地 `config.ini`。
 - Qoder Public 版使用专属渠道码注册链接：`https://platform.dknowc.cn/auth/#/register?channel=5DBF147C-A4D0-4C3E-AB1A-6C6F5EA39B18&type=6`。
 - Qoder Skill 源码仓库为 `https://github.com/dylanzhangzx/dknowc-official-doc-writer-qoder`。
