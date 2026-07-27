@@ -4,8 +4,8 @@ title: Modellix
 description: Generate images and videos via Modellix's unified model API and CLI (model run --wait, task download).
 source: community
 author: Modellix
-githubUrl: https://github.com/Modellix/modellix-skill/tree/main/modellix-skill
-docsUrl: https://docs.modellix.ai/llms.txt
+githubUrl: https://github.com/Modellix/modellix-plugin/tree/main/skills/modellix
+docsUrl: https://docs.modellix.ai/ways-to-use/plugin
 category: design
 tags:
   - image-generation
@@ -21,11 +21,11 @@ featured: false
 popular: false
 isOfficial: false
 installCommand: |
-  git clone https://github.com/Modellix/modellix-skill
-  cp -r modellix-skill/modellix-skill ~/.qoder/skills/modellix
+  git clone https://github.com/Modellix/modellix-plugin
+  cp -r modellix-plugin/skills/modellix ~/.qoder/skills/modellix
   npm i -g modellix-cli@latest
 date: 2026-07-16
-lastUpdated: 2026-07-16
+lastUpdated: 2026-07-27
 ---
 
 ## Use Cases
@@ -61,7 +61,7 @@ modellix-cli task download <task_id> --output-dir ./outputs --json
 
 ## Notes
 
-- Install only the `modellix-skill/` package directory into `~/.qoder/skills/modellix` (not the whole monorepo root).
+- Install only the `skills/modellix/` directory into `~/.qoder/skills/modellix` (not the whole repository root).
 - Prefer `modellix-cli` over hand-rolled REST polling when the CLI is available.
 - Prefer machine-readable flags (`--json` / `--quiet`) for automation.
-- See docs index: https://docs.modellix.ai/llms.txt and CLI: https://www.npmjs.com/package/modellix-cli
+- See the plugin guide: https://docs.modellix.ai/ways-to-use/plugin , docs index: https://docs.modellix.ai/llms.txt and CLI: https://www.npmjs.com/package/modellix-cli
