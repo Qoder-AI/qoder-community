@@ -35,7 +35,7 @@ modellix-cli task download <task_id> --output-dir ./outputs --json
 
 ## 注意事项
 
-- 安装到 Qoder 时只复制 `modellix-skill/` 包目录到 `~/.qoder/skills/modellix`，不要复制整个仓库根目录。
+- 安装到 Qoder 时只复制 `skills/modellix/` 目录到 `~/.qoder/skills/modellix`，不要复制整个仓库根目录。
 - 有 CLI 时优先用 `modellix-cli`，不要手写 REST 轮询。
 - 自动化场景优先使用 `--json` / `--quiet`。
-- 文档索引：https://docs.modellix.ai/llms.txt ；CLI：https://www.npmjs.com/package/modellix-cli
+- 插件指南：https://docs.modellix.ai/ways-to-use/plugin ；文档索引：https://docs.modellix.ai/llms.txt ；CLI：https://www.npmjs.com/package/modellix-cli
