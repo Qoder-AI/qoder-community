@@ -10,6 +10,10 @@ export interface SkillTranslation {
 }
 
 export const skillsTranslations: Record<string, SkillTranslation> = {
+  'audiocreator-foleyix': {
+    zhTitle: 'Audio Creator · Foleyix 声音创作',
+    zhDescription: '撰写声音提示词，创作背景音乐、人声歌曲、播客、环境音、音效和语音',
+  },
   // === Design Skills ===
   'canvas-design': {
     // No zhName - keep 'canvas-design' in English
