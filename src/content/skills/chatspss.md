@@ -29,7 +29,7 @@ date: 2026-10-30
 
 ## Supported Tasks
 
-The public v0.2.1 package documents these 22 common tasks:
+The public v0.2.2 package documents these 22 common tasks:
 
 1. Data overview
 2. Frequencies and proportions
@@ -71,3 +71,5 @@ Example request after installation:
 - The package's result-display instructions require all user-visible Markdown tables emitted by the analysis script to be rendered in full, preserving their headers, order, values, precision, significance markers, titles, and notes before the explanation.
 - Advanced requests such as CFA/SEM, mediation or moderation, longitudinal and panel models, spatial analysis, and advanced machine-learning models are recognized and described as outside the implemented 22-task set. The package provides on-demand scope references; it does not claim its local analysis script runs those methods.
 - The public package uses local scripts and Python dependencies. This listing does not claim that the Qoder integration has been tested, that Qoder endorses ChatSPSS, or that the package is an official Qoder skill.
+
+The public baseline source and documentation are available under MIT-0, allowing modification, redistribution and commercial use without attribution.
