@@ -29,7 +29,7 @@ date: 2026-10-30
 
 ## Supported Tasks
 
-The public v0.2.2 package documents these 22 common tasks:
+The public v0.2.4 package documents these 22 common tasks:
 
 1. Data overview
 2. Frequencies and proportions
