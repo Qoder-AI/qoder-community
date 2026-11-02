@@ -25,7 +25,7 @@ date: 2026-11-02
 lastUpdated: 2026-11-02
 ---
 
-## What it does
+## Use Cases
 
 Drafts a first-pass earnings note for one A-share company from its disclosed report, in a fixed order:
 
@@ -34,14 +34,14 @@ Drafts a first-pass earnings note for one A-share company from its disclosed rep
 3. **Guidance vs actual** - if a prior pre-announcement exists, actuals are compared against it rather than against the consensus we cannot verify.
 4. **Anchored output** - every figure carries a source pointer (document, page or table cell) so a reviewer can re-open exactly that spot.
 
-## Hard limits (deliberate, not missing)
+## Notes
 
 - **No ratings, no target prices.** Those fields are emitted as `[needs human]` placeholders.
 - **No fabricated sources.** If a number is not in the disclosed material, the line says it was not found instead of filling it in.
 - **Live domain availability is read from the channel catalog at run time**; nothing is promised about domains that are not currently open, and no tool list is hard-coded.
 - The data leg is provided by the Cue channel and needs one API key - no self-hosted data sources, no bundled corpus.
 
-## How to run it
+## Example
 
 ```text
 npx skills add huhoo/cue-awesome --skill cn-earnings-note
@@ -49,7 +49,7 @@ npx skills add huhoo/cue-awesome --skill cn-earnings-note
 
 Then ask for a company and a period, e.g. "write the earnings note for <company> FY26Q3". The skill drives its own checklist and refuses to output an unanchored figure; a machine check inside the package scans the draft and fails it if any number lacks a source pointer.
 
-## Verifying the install
+**Verifying the install**
 
 The package ships its own self-test entry:
 
