@@ -306,6 +306,11 @@ export const skillsTranslations: Record<string, SkillTranslation> = {
     zhTitle: 'PostgreSQL 查询',
     zhDescription: '在 PostgreSQL 数据库上执行安全的只读 SQL 查询和数据分析',
   },
+  'chatspss': {
+    // Keep the ChatSPSS brand name in English
+    zhTitle: 'ChatSPSS',
+    zhDescription: '在用户提供的数据上本地运行 22 类常见统计分析，并完整展示 Markdown 结果表；对未实现的进阶方法如实说明范围',
+  },
   'evaluation': {
     zhName: '评估框架',
     zhTitle: '评估框架',
