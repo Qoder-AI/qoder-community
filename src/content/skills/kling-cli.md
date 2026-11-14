@@ -36,5 +36,6 @@ Ask the agent: “Help me create a video from this image using Kling.” The ski
 ## Notes
 
 - The skill uses the official Kling CLI and requires Node.js 18 or later. Install the CLI package for your region and complete browser OAuth before use; see the upstream skill for current instructions.
-- Generation consumes account credits. Available models and parameters depend on the connected service and account.
+- Choose `@klingai/cli-cn` for a China-region account (`klingai.com`) or `@klingai/cli-global` for a Global account (`kling.ai`); do not assume regional accounts, credits or task IDs are interchangeable.
+- Generation consumes account credits. Check the connected account’s available models, parameters and generation costs before confirming a submission; this listing does not promise free generation.
 - This listing links to the upstream project. Qoder-specific runtime compatibility has not been independently verified.
